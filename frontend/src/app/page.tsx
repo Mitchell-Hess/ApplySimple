@@ -7,6 +7,9 @@ import { StatsCard } from '@/components/StatsCard';
 import { ApplicationsTable } from '@/components/ApplicationsTable';
 import { StatusChart } from '@/components/StatusChart';
 import { SourceAnalytics } from '@/components/SourceAnalytics';
+import { FilterBar, FilterState } from '@/components/FilterBar';
+import { useState, useMemo } from 'react';
+import { Application } from '@/types/application';
 
 export default function Home() {
   const { data: applications, isLoading: appsLoading, error: appsError } = useQuery({
@@ -18,6 +21,69 @@ export default function Home() {
     queryKey: ['stats'],
     queryFn: fetchStats,
   });
+
+  const [filters, setFilters] = useState<FilterState>({
+    search: '',
+    status: '',
+    source: '',
+    jobType: '',
+    dateFrom: '',
+    dateTo: '',
+  });
+
+  // Get unique sources for filter dropdown
+  const availableSources = useMemo(() => {
+    if (!applications) return [];
+    const sources = new Set(applications.map(app => app.foundOn));
+    return Array.from(sources).sort();
+  }, [applications]);
+
+  // Filter applications based on current filters
+  const filteredApplications = useMemo(() => {
+    if (!applications) return [];
+
+    return applications.filter((app: Application) => {
+      // Search filter (company, job title, notes)
+      if (filters.search) {
+        const searchLower = filters.search.toLowerCase();
+        const matchesSearch =
+          app.company.toLowerCase().includes(searchLower) ||
+          app.jobTitle.toLowerCase().includes(searchLower) ||
+          (app.notes && app.notes.toLowerCase().includes(searchLower));
+        if (!matchesSearch) return false;
+      }
+
+      // Status filter
+      if (filters.status && app.status !== filters.status) {
+        return false;
+      }
+
+      // Source filter
+      if (filters.source && app.foundOn !== filters.source) {
+        return false;
+      }
+
+      // Job Type filter
+      if (filters.jobType && app.jobType !== filters.jobType) {
+        return false;
+      }
+
+      // Date range filter
+      if (filters.dateFrom) {
+        const appDate = new Date(app.dateApplied);
+        const fromDate = new Date(filters.dateFrom);
+        if (appDate < fromDate) return false;
+      }
+
+      if (filters.dateTo) {
+        const appDate = new Date(app.dateApplied);
+        const toDate = new Date(filters.dateTo);
+        if (appDate > toDate) return false;
+      }
+
+      return true;
+    });
+  }, [applications, filters]);
 
   const isLoading = appsLoading || statsLoading;
   const error = appsError || statsError;
@@ -268,22 +334,44 @@ export default function Home() {
           {/* Applications Table */}
           <Box>
             <HStack justify="space-between" mb={4} flexWrap="wrap" gap={3}>
-              <Heading size="lg" color="gray.900">Recent Applications</Heading>
-              <Badge
-                colorPalette="gray"
-                size="lg"
-                px={4}
-                py={2}
-                borderRadius="full"
-                bg="gray.100"
-                color="gray.700"
-                borderWidth="1px"
-                borderColor="gray.300"
-              >
-                {applications?.length || 0} total
-              </Badge>
+              <Heading size="lg" color="gray.900">Applications</Heading>
+              <HStack gap={3}>
+                <Badge
+                  colorPalette="green"
+                  size="lg"
+                  px={4}
+                  py={2}
+                  borderRadius="full"
+                  bg="green.100"
+                  color="green.800"
+                  borderWidth="1px"
+                  borderColor="green.300"
+                >
+                  {filteredApplications.length} filtered
+                </Badge>
+                <Badge
+                  colorPalette="gray"
+                  size="lg"
+                  px={4}
+                  py={2}
+                  borderRadius="full"
+                  bg="gray.100"
+                  color="gray.700"
+                  borderWidth="1px"
+                  borderColor="gray.300"
+                >
+                  {applications?.length || 0} total
+                </Badge>
+              </HStack>
             </HStack>
-            <ApplicationsTable applications={applications || []} />
+
+            <FilterBar
+              filters={filters}
+              onFilterChange={setFilters}
+              availableSources={availableSources}
+            />
+
+            <ApplicationsTable applications={filteredApplications} />
           </Box>
         </VStack>
       </Container>
