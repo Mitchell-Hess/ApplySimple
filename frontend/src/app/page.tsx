@@ -1,96 +1,288 @@
 'use client';
 
-import { Box, Container, Heading, SimpleGrid, Spinner, Text, VStack } from '@chakra-ui/react';
+import { Box, Container, Grid, GridItem, Heading, SimpleGrid, Spinner, Text, VStack, HStack, Badge, Flex, Icon } from '@chakra-ui/react';
 import { useQuery } from '@tanstack/react-query';
-import { fetchApplications } from '@/lib/api';
+import { fetchApplications, fetchStats } from '@/lib/api';
 import { StatsCard } from '@/components/StatsCard';
 import { ApplicationsTable } from '@/components/ApplicationsTable';
 import { StatusChart } from '@/components/StatusChart';
+import { SourceAnalytics } from '@/components/SourceAnalytics';
 
 export default function Home() {
-  const { data: applications, isLoading, error } = useQuery({
+  const { data: applications, isLoading: appsLoading, error: appsError } = useQuery({
     queryKey: ['applications'],
     queryFn: fetchApplications,
   });
 
+  const { data: stats, isLoading: statsLoading, error: statsError } = useQuery({
+    queryKey: ['stats'],
+    queryFn: fetchStats,
+  });
+
+  const isLoading = appsLoading || statsLoading;
+  const error = appsError || statsError;
+
   if (isLoading) {
     return (
-      <Box minH="100vh" display="flex" alignItems="center" justifyContent="center">
-        <Spinner size="xl" color="teal.500" />
+      <Box minH="100vh" display="flex" alignItems="center" justifyContent="center" bg="linear-gradient(135deg, #f0fdf4 0%, #fef3f2 100%)">
+        <VStack gap={4}>
+          <Spinner size="xl" color="blue.500" thickness="4px" />
+          <Text color="gray.600">Loading your applications...</Text>
+        </VStack>
       </Box>
     );
   }
 
   if (error) {
     return (
-      <Box minH="100vh" display="flex" alignItems="center" justifyContent="center">
-        <Text color="red.500">Error loading applications</Text>
+      <Box minH="100vh" display="flex" alignItems="center" justifyContent="center" bg="linear-gradient(135deg, #f0fdf4 0%, #fef3f2 100%)">
+        <VStack gap={3}>
+          <Text fontSize="4xl">⚠️</Text>
+          <Text color="red.500" fontSize="lg" fontWeight="medium">Error loading applications</Text>
+          <Text color="gray.600" fontSize="sm">Please try refreshing the page</Text>
+        </VStack>
       </Box>
     );
   }
 
-  const totalApplications = applications?.length || 0;
-  const activeApplications = applications?.filter(
-    app => !['Rejected', 'Withdrawn', 'Offer'].includes(app.status)
-  ).length || 0;
-  const interviews = applications?.filter(app => app.status === 'Interview').length || 0;
-  const avgSuccess = applications?.length
-    ? (applications.reduce((sum, app) => sum + (app.predictedSuccess || 0), 0) / applications.length * 100).toFixed(0)
+  // Calculate derived stats
+  const activeApplications = stats?.statusCounts.find(s => s.status === 'Applied')?.count || 0;
+  const interviews = stats?.statusCounts.find(s => s.status === 'Interview')?.count || 0;
+  const offers = stats?.statusCounts.find(s => s.status === 'Offer')?.count || 0;
+  const rejected = stats?.statusCounts.find(s => s.status === 'Rejected')?.count || 0;
+
+  const responseRate = stats?.totalApplications
+    ? ((stats.withOutcomes / stats.totalApplications) * 100).toFixed(1)
     : 0;
 
+  const interviewRate = stats?.totalApplications
+    ? ((stats.withInterviews / stats.totalApplications) * 100).toFixed(1)
+    : 0;
+
+  const topSource = stats?.sourceCounts[0];
+  const remoteJobs = stats?.jobTypeCounts.find(j => j.jobType === 'Remote')?.count || 0;
+
   return (
-    <Box minH="100vh" bg="gray.50" _dark={{ bg: 'gray.900' }} py={8}>
+    <Box minH="100vh" bg="linear-gradient(135deg, #f0fdf4 0%, #fef3f2 100%)" py={8}>
       <Container maxW="7xl">
         <VStack gap={8} align="stretch">
           {/* Header */}
-          <Box>
-            <Heading size="2xl" mb={2}>ApplySimple Dashboard</Heading>
-            <Text color="gray.600" _dark={{ color: 'gray.400' }}>
-              Track and analyze your job applications with ML-powered insights
-            </Text>
+          <Box py={6}>
+            <VStack align="start" gap={4} mb={6}>
+              <Heading
+                size="3xl"
+                fontWeight="bold"
+                color="gray.900"
+                letterSpacing="tight"
+              >
+                ApplySimple
+              </Heading>
+              <Text color="gray.600" fontSize="lg" maxW="3xl" lineHeight="tall">
+                A comprehensive job application tracking system that helps you organize, monitor, and analyze your job search.
+                Track applications, visualize your pipeline, and gain insights into your application success rates across different platforms and job types.
+              </Text>
+            </VStack>
+            <HStack gap={4} flexWrap="wrap">
+              <Badge
+                size="lg"
+                px={4}
+                py={2}
+                borderRadius="md"
+                bg="green.100"
+                color="green.800"
+                fontWeight="semibold"
+              >
+                {stats?.totalApplications || 0} Total Applications
+              </Badge>
+              <Badge
+                size="lg"
+                px={4}
+                py={2}
+                borderRadius="md"
+                bg="blue.100"
+                color="blue.800"
+                fontWeight="semibold"
+              >
+                {stats?.recentApplications || 0} Recent (30 days)
+              </Badge>
+            </HStack>
           </Box>
 
-          {/* Stats Grid */}
-          <SimpleGrid columns={{ base: 1, md: 2, lg: 4 }} gap={6}>
+          {/* Primary Stats Grid */}
+          <SimpleGrid columns={{ base: 1, sm: 2, lg: 4 }} gap={6}>
             <StatsCard
               label="Total Applications"
-              value={totalApplications}
-              color="blue"
+              value={stats?.totalApplications || 0}
+              color="mint"
+              subtitle={`${stats?.recentApplications || 0} this month`}
             />
             <StatsCard
-              label="Active"
-              value={activeApplications}
-              color="purple"
+              label="Interview Rate"
+              value={`${interviewRate}%`}
+              color="peach"
+              subtitle={`${stats?.withInterviews || 0} total interviews`}
             />
             <StatsCard
-              label="Interviews"
-              value={interviews}
-              color="green"
+              label="Response Rate"
+              value={`${responseRate}%`}
+              color="lavender"
+              subtitle={`${stats?.avgResponseTime || 0} days avg`}
             />
             <StatsCard
-              label="Avg Success Rate"
-              value={`${avgSuccess}%`}
-              color="teal"
+              label="Offers Received"
+              value={offers}
+              color="sky"
+              subtitle={`${rejected} rejections`}
             />
           </SimpleGrid>
 
-          {/* Chart */}
+          {/* Secondary Stats Grid */}
+          <SimpleGrid columns={{ base: 1, sm: 2, lg: 4 }} gap={6}>
+            <Box
+              p={6}
+              bg="green.50"
+              borderRadius="xl"
+              borderWidth="1px"
+              borderColor="green.200"
+              shadow="sm"
+              transition="all 0.2s"
+              _hover={{ shadow: 'md', transform: 'translateY(-2px)' }}
+            >
+              <Text fontSize="xs" color="green.700" mb={2} fontWeight="semibold">
+                Top Source
+              </Text>
+              <Text fontSize="2xl" fontWeight="bold" color="gray.900">
+                {topSource?.source || 'N/A'}
+              </Text>
+              <Text fontSize="sm" color="gray.600" mt={1}>
+                {topSource?.count || 0} applications
+              </Text>
+            </Box>
+
+            <Box
+              p={6}
+              bg="orange.50"
+              borderRadius="xl"
+              borderWidth="1px"
+              borderColor="orange.200"
+              shadow="sm"
+              transition="all 0.2s"
+              _hover={{ shadow: 'md', transform: 'translateY(-2px)' }}
+            >
+              <Text fontSize="xs" color="orange.700" mb={2} fontWeight="semibold">
+                Remote Jobs
+              </Text>
+              <Text fontSize="2xl" fontWeight="bold" color="gray.900">
+                {remoteJobs}
+              </Text>
+              <Text fontSize="sm" color="gray.600" mt={1}>
+                {stats?.totalApplications ? ((remoteJobs / stats.totalApplications) * 100).toFixed(0) : 0}% of total
+              </Text>
+            </Box>
+
+            <Box
+              p={6}
+              bg="purple.50"
+              borderRadius="xl"
+              borderWidth="1px"
+              borderColor="purple.200"
+              shadow="sm"
+              transition="all 0.2s"
+              _hover={{ shadow: 'md', transform: 'translateY(-2px)' }}
+            >
+              <Text fontSize="xs" color="purple.700" mb={2} fontWeight="semibold">
+                Cover Letters
+              </Text>
+              <Text fontSize="2xl" fontWeight="bold" color="gray.900">
+                {stats?.withCoverLetters || 0}
+              </Text>
+              <Text fontSize="sm" color="gray.600" mt={1}>
+                {stats?.totalApplications ? ((stats.withCoverLetters / stats.totalApplications) * 100).toFixed(0) : 0}% of apps
+              </Text>
+            </Box>
+
+            <Box
+              p={6}
+              bg="blue.50"
+              borderRadius="xl"
+              borderWidth="1px"
+              borderColor="blue.200"
+              shadow="sm"
+              transition="all 0.2s"
+              _hover={{ shadow: 'md', transform: 'translateY(-2px)' }}
+            >
+              <Text fontSize="xs" color="blue.700" mb={2} fontWeight="semibold">
+                Active Pipeline
+              </Text>
+              <Text fontSize="2xl" fontWeight="bold" color="gray.900">
+                {activeApplications + interviews}
+              </Text>
+              <Text fontSize="sm" color="gray.600" mt={1}>
+                {activeApplications} applied, {interviews} interviewing
+              </Text>
+            </Box>
+          </SimpleGrid>
+
+          {/* Chart Section */}
           {applications && applications.length > 0 && (
             <Box
               p={6}
-              bg="white"
-              _dark={{ bg: 'gray.800' }}
-              borderRadius="lg"
+              bg="linear-gradient(135deg, #fafafa 0%, #f5f5f5 100%)"
+              borderRadius="xl"
               borderWidth="1px"
-              borderColor="gray.200"
+              borderColor="gray.300"
+              shadow="sm"
             >
-              <StatusChart applications={applications} />
+              <VStack align="stretch" gap={4}>
+                <HStack justify="space-between" align="center" flexWrap="wrap" gap={3}>
+                  <VStack align="start" gap={1}>
+                    <Heading size="lg" color="gray.900" fontWeight="bold">
+                      Application Status Overview
+                    </Heading>
+                    <Text fontSize="sm" color="gray.600">
+                      Visual breakdown of your application pipeline
+                    </Text>
+                  </VStack>
+                  <Badge
+                    size="md"
+                    px={4}
+                    py={2}
+                    borderRadius="md"
+                    bg="white"
+                    color="gray.700"
+                    fontWeight="semibold"
+                    borderWidth="1px"
+                    borderColor="gray.300"
+                  >
+                    {applications.length} Total
+                  </Badge>
+                </HStack>
+                <StatusChart applications={applications} />
+              </VStack>
             </Box>
           )}
 
+          {/* Analytics Section */}
+          {stats && <SourceAnalytics stats={stats} />}
+
           {/* Applications Table */}
           <Box>
-            <Heading size="lg" mb={4}>Recent Applications</Heading>
+            <HStack justify="space-between" mb={4} flexWrap="wrap" gap={3}>
+              <Heading size="lg" color="gray.900">Recent Applications</Heading>
+              <Badge
+                colorPalette="gray"
+                size="lg"
+                px={4}
+                py={2}
+                borderRadius="full"
+                bg="gray.100"
+                color="gray.700"
+                borderWidth="1px"
+                borderColor="gray.300"
+              >
+                {applications?.length || 0} total
+              </Badge>
+            </HStack>
             <ApplicationsTable applications={applications || []} />
           </Box>
         </VStack>

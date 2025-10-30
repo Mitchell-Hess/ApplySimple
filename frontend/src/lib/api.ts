@@ -1,4 +1,4 @@
-import { Application, PredictionRequest, PredictionResponse } from '@/types/application';
+import { Application, PredictionRequest, PredictionResponse, Stats } from '@/types/application';
 
 const API_BASE = '/api';
 
@@ -6,6 +6,14 @@ export async function fetchApplications(): Promise<Application[]> {
   const response = await fetch(`${API_BASE}/applications`);
   if (!response.ok) {
     throw new Error('Failed to fetch applications');
+  }
+  return response.json();
+}
+
+export async function fetchStats(): Promise<Stats> {
+  const response = await fetch(`${API_BASE}/stats`);
+  if (!response.ok) {
+    throw new Error('Failed to fetch stats');
   }
   return response.json();
 }

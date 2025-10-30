@@ -3,10 +3,15 @@ import { prisma } from '@/lib/prisma';
 
 export async function GET(request: NextRequest) {
   try {
-    // Fetch all applications from database, ordered by most recent first
+    const searchParams = request.nextUrl.searchParams;
+    const limit = searchParams.get('limit');
+    const offset = searchParams.get('offset');
+
+    // Fetch applications from database, ordered by most recent first
     const applications = await prisma.application.findMany({
       orderBy: { dateApplied: 'desc' },
-      take: 100, // Limit to most recent 100 for performance
+      take: limit ? parseInt(limit) : undefined,
+      skip: offset ? parseInt(offset) : undefined,
     });
 
     return NextResponse.json(applications);
