@@ -31,11 +31,23 @@ export default function Home() {
     dateTo: '',
   });
 
-  // Get unique sources for filter dropdown
+  // Get unique values for filter dropdowns
   const availableSources = useMemo(() => {
     if (!applications) return [];
     const sources = new Set(applications.map(app => app.foundOn));
     return Array.from(sources).sort();
+  }, [applications]);
+
+  const availableStatuses = useMemo(() => {
+    if (!applications) return [];
+    const statuses = new Set(applications.map(app => app.status));
+    return Array.from(statuses).sort();
+  }, [applications]);
+
+  const availableJobTypes = useMemo(() => {
+    if (!applications) return [];
+    const jobTypes = new Set(applications.map(app => app.jobType).filter(Boolean));
+    return Array.from(jobTypes).sort();
   }, [applications]);
 
   // Filter applications based on current filters
@@ -369,6 +381,8 @@ export default function Home() {
               filters={filters}
               onFilterChange={setFilters}
               availableSources={availableSources}
+              availableStatuses={availableStatuses}
+              availableJobTypes={availableJobTypes}
             />
 
             <ApplicationsTable applications={filteredApplications} />
