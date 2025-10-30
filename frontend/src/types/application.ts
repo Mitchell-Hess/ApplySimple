@@ -49,3 +49,15 @@ export interface PredictionResponse {
   factors: Record<string, string>;
   recommendation: string;
 }
+
+export interface Stats {
+  totalApplications: number;
+  statusCounts: Array<{ status: string; count: number }>;
+  sourceCounts: Array<{ source: string; count: number }>;
+  jobTypeCounts: Array<{ jobType: string | null; count: number }>;
+  withOutcomes: number;
+  withCoverLetters: number;
+  withInterviews: number;
+  recentApplications: number;
+  avgResponseTime: number;
+}
