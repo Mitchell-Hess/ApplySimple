@@ -1,0 +1,49 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Application {
+  id                String   @id @default(cuid())
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  // Job Information (matches your spreadsheet)
+  company           String                    // Column: Company
+  jobTitle          String                    // Column: Job Title
+  salary            String?                   // Column: Salary
+  jobType           String?                   // Column: Job Type (Remote, Hybrid, etc.)
+  jobUrl            String?   @db.Text        // Column: Link to Job Posting
+
+  // Application Details
+  dateApplied       DateTime                  // Column: Date Applied
+  foundOn           String                    // Column: Found On? (Built In, Otta, LinkedIn, etc.)
+  coverLetterUsed   Boolean   @default(false) // Column: Cover Letter? (Yes/No)
+
+  // Interview Process
+  numberOfRounds    Int?                      // Column: Number of Rounds
+  dateOfOutcome     DateTime?                 // Column: Date of Offer/Rejection
+
+  // Notes & Additional Info
+  notes             String?   @db.Text        // Column: Notes
+
+  // ML Predictions (calculated by app)
+  predictedSuccess  Float?                    // Probability of success (0.0 to 1.0)
+  predictionDate    DateTime?
+
+  // Computed Status (derived from your data)
+  status            String    @default("Applied")  // Applied, Interview, Offer, Rejected
+
+  @@index([status])
+  @@index([dateApplied])
+  @@index([company])
+  @@index([foundOn])
+  @@map("applications")
+}
