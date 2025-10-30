@@ -16,9 +16,11 @@ interface FilterBarProps {
   filters: FilterState;
   onFilterChange: (filters: FilterState) => void;
   availableSources: string[];
+  availableStatuses: string[];
+  availableJobTypes: string[];
 }
 
-export function FilterBar({ filters, onFilterChange, availableSources }: FilterBarProps) {
+export function FilterBar({ filters, onFilterChange, availableSources, availableStatuses, availableJobTypes }: FilterBarProps) {
   const handleInputChange = (field: keyof FilterState, value: string) => {
     onFilterChange({
       ...filters,
@@ -90,12 +92,11 @@ export function FilterBar({ filters, onFilterChange, availableSources }: FilterB
               height="44px"
             >
               <option value="">All Statuses</option>
-              <option value="Applied">Applied</option>
-              <option value="Screening">Screening</option>
-              <option value="Interview">Interview</option>
-              <option value="Offer">Offer</option>
-              <option value="Rejected">Rejected</option>
-              <option value="Withdrawn">Withdrawn</option>
+              {availableStatuses.map((status) => (
+                <option key={status} value={status}>
+                  {status}
+                </option>
+              ))}
             </Box>
           </Box>
 
@@ -151,9 +152,11 @@ export function FilterBar({ filters, onFilterChange, availableSources }: FilterB
               height="44px"
             >
               <option value="">All Types</option>
-              <option value="Remote">Remote</option>
-              <option value="Hybrid">Hybrid</option>
-              <option value="On-site">On-site</option>
+              {availableJobTypes.map((jobType) => (
+                <option key={jobType} value={jobType}>
+                  {jobType}
+                </option>
+              ))}
             </Box>
           </Box>
 
