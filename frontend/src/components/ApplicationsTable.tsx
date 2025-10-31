@@ -1,6 +1,7 @@
 'use client';
 
 import { Box, Table, Badge, Text, HStack, Link, Button, Icon } from '@chakra-ui/react';
+import { useColorMode } from '@/lib/color-mode';
 import { Application } from '@/types/application';
 import { useState, useMemo } from 'react';
 import { LuArrowUp, LuArrowDown, LuArrowUpDown } from 'react-icons/lu';
@@ -28,6 +29,7 @@ const jobTypeColors: Record<string, string> = {
 };
 
 export function ApplicationsTable({ applications }: ApplicationsTableProps) {
+  const { colorMode } = useColorMode();
   const [showAll, setShowAll] = useState(false);
   const [sortField, setSortField] = useState<SortField | null>(null);
   const [sortDirection, setSortDirection] = useState<SortDirection>(null);
@@ -90,7 +92,7 @@ export function ApplicationsTable({ applications }: ApplicationsTableProps) {
 
   const SortIcon = ({ field }: { field: SortField }) => {
     if (sortField !== field) {
-      return <Icon fontSize="sm" color="gray.400"><LuArrowUpDown /></Icon>;
+      return <Icon fontSize="sm" color={colorMode === 'light' ? 'gray.400' : 'gray.500'}><LuArrowUpDown /></Icon>;
     }
     if (sortDirection === 'asc') {
       return <Icon fontSize="sm" color="blue.600"><LuArrowUp /></Icon>;
@@ -100,7 +102,7 @@ export function ApplicationsTable({ applications }: ApplicationsTableProps) {
 
   if (applications.length === 0) {
     return (
-      <Box p={{ base: 6, md: 8 }} textAlign="center" color="gray.500" bg="white" borderRadius="xl" borderWidth="1px" borderColor="gray.200">
+      <Box p={{ base: 6, md: 8 }} textAlign="center" color={colorMode === 'light' ? 'gray.500' : 'gray.400'} bg={colorMode === 'light' ? 'white' : 'gray.800'} borderRadius="xl" borderWidth="1px" borderColor={colorMode === 'light' ? 'gray.200' : 'gray.600'}>
         <Text fontSize={{ base: "sm", md: "md" }}>No applications yet. Start adding your job applications!</Text>
       </Box>
     );
@@ -112,20 +114,20 @@ export function ApplicationsTable({ applications }: ApplicationsTableProps) {
         overflowX="auto"
         borderRadius="xl"
         borderWidth="1px"
-        borderColor="gray.200"
-        bg="white"
+        borderColor={colorMode === 'light' ? 'gray.200' : 'gray.600'}
+        bg={colorMode === 'light' ? 'white' : 'gray.800'}
         shadow="sm"
       >
         <Table.Root size="sm" variant="outline">
-          <Table.Header bg="gray.50" borderBottomWidth="2px" borderColor="gray.200">
+          <Table.Header bg={colorMode === 'light' ? 'gray.50' : 'gray.700'} borderBottomWidth="2px" borderColor={colorMode === 'light' ? 'gray.200' : 'gray.600'}>
             <Table.Row>
               <Table.ColumnHeader
                 fontWeight="semibold"
-                color="gray.700"
+                color={colorMode === 'light' ? 'gray.700' : 'gray.300'}
                 fontSize="xs"
                 cursor="pointer"
                 onClick={() => handleSort('company')}
-                _hover={{ bg: 'gray.100' }}
+                _hover={{ bg: colorMode === 'light' ? 'gray.100' : 'gray.600' }}
                 userSelect="none"
               >
                 <HStack gap={1}>
@@ -135,11 +137,11 @@ export function ApplicationsTable({ applications }: ApplicationsTableProps) {
               </Table.ColumnHeader>
               <Table.ColumnHeader
                 fontWeight="semibold"
-                color="gray.700"
+                color={colorMode === 'light' ? 'gray.700' : 'gray.300'}
                 fontSize="xs"
                 cursor="pointer"
                 onClick={() => handleSort('jobTitle')}
-                _hover={{ bg: 'gray.100' }}
+                _hover={{ bg: colorMode === 'light' ? 'gray.100' : 'gray.600' }}
                 userSelect="none"
               >
                 <HStack gap={1}>
@@ -150,11 +152,11 @@ export function ApplicationsTable({ applications }: ApplicationsTableProps) {
               <Table.ColumnHeader fontWeight="semibold" color="gray.700" fontSize="xs">Type</Table.ColumnHeader>
               <Table.ColumnHeader
                 fontWeight="semibold"
-                color="gray.700"
+                color={colorMode === 'light' ? 'gray.700' : 'gray.300'}
                 fontSize="xs"
                 cursor="pointer"
                 onClick={() => handleSort('salary')}
-                _hover={{ bg: 'gray.100' }}
+                _hover={{ bg: colorMode === 'light' ? 'gray.100' : 'gray.600' }}
                 userSelect="none"
               >
                 <HStack gap={1}>
@@ -164,11 +166,11 @@ export function ApplicationsTable({ applications }: ApplicationsTableProps) {
               </Table.ColumnHeader>
               <Table.ColumnHeader
                 fontWeight="semibold"
-                color="gray.700"
+                color={colorMode === 'light' ? 'gray.700' : 'gray.300'}
                 fontSize="xs"
                 cursor="pointer"
                 onClick={() => handleSort('status')}
-                _hover={{ bg: 'gray.100' }}
+                _hover={{ bg: colorMode === 'light' ? 'gray.100' : 'gray.600' }}
                 userSelect="none"
               >
                 <HStack gap={1}>
@@ -180,11 +182,11 @@ export function ApplicationsTable({ applications }: ApplicationsTableProps) {
               <Table.ColumnHeader fontWeight="semibold" color="gray.700" fontSize="xs">Source</Table.ColumnHeader>
               <Table.ColumnHeader
                 fontWeight="semibold"
-                color="gray.700"
+                color={colorMode === 'light' ? 'gray.700' : 'gray.300'}
                 fontSize="xs"
                 cursor="pointer"
                 onClick={() => handleSort('dateApplied')}
-                _hover={{ bg: 'gray.100' }}
+                _hover={{ bg: colorMode === 'light' ? 'gray.100' : 'gray.600' }}
                 userSelect="none"
               >
                 <HStack gap={1}>
@@ -200,14 +202,14 @@ export function ApplicationsTable({ applications }: ApplicationsTableProps) {
             <Table.Row
               key={app.id}
               _hover={{
-                bg: 'gray.50'
+                bg: colorMode === 'light' ? 'gray.50' : 'gray.700'
               }}
               transition="background 0.2s"
               borderBottomWidth="1px"
-              borderColor="gray.100"
+              borderColor={colorMode === 'light' ? 'gray.100' : 'gray.600'}
             >
               <Table.Cell>
-                <Text fontWeight="semibold" color="gray.900" fontSize="sm">
+                <Text fontWeight="semibold" color={colorMode === 'light' ? 'gray.900' : 'white'} fontSize="sm">
                   {app.company}
                 </Text>
               </Table.Cell>
@@ -224,7 +226,7 @@ export function ApplicationsTable({ applications }: ApplicationsTableProps) {
                     {app.jobTitle}
                   </Link>
                 ) : (
-                  <Text fontSize="sm" color="gray.700">{app.jobTitle}</Text>
+                  <Text fontSize="sm" color={colorMode === 'light' ? 'gray.700' : 'gray.300'}>{app.jobTitle}</Text>
                 )}
               </Table.Cell>
               <Table.Cell>
@@ -236,11 +238,11 @@ export function ApplicationsTable({ applications }: ApplicationsTableProps) {
                     {app.jobType}
                   </Badge>
                 ) : (
-                  <Text color="gray.400" fontSize="xs">-</Text>
+                  <Text color={colorMode === 'light' ? 'gray.400' : 'gray.500'} fontSize="xs">-</Text>
                 )}
               </Table.Cell>
               <Table.Cell>
-                <Text fontSize="xs" color="gray.700" fontWeight="medium">
+                <Text fontSize="xs" color={colorMode === 'light' ? 'gray.700' : 'gray.300'} fontWeight="medium">
                   {app.salary || '-'}
                 </Text>
               </Table.Cell>
@@ -256,22 +258,22 @@ export function ApplicationsTable({ applications }: ApplicationsTableProps) {
                       <Badge colorPalette="purple" size="sm">
                         {app.numberOfRounds}
                       </Badge>
-                      <Text fontSize="xs" color="gray.500">
+                      <Text fontSize="xs" color={colorMode === 'light' ? 'gray.500' : 'gray.400'}>
                         {app.numberOfRounds === 1 ? 'round' : 'rounds'}
                       </Text>
                     </>
                   ) : (
-                    <Text color="gray.400" fontSize="xs">-</Text>
+                    <Text color={colorMode === 'light' ? 'gray.400' : 'gray.500'} fontSize="xs">-</Text>
                   )}
                 </HStack>
               </Table.Cell>
               <Table.Cell>
-                <Text fontSize="xs" color="gray.600">
+                <Text fontSize="xs" color={colorMode === 'light' ? 'gray.600' : 'gray.400'}>
                   {app.foundOn}
                 </Text>
               </Table.Cell>
               <Table.Cell>
-                <Text fontSize="xs" color="gray.600">
+                <Text fontSize="xs" color={colorMode === 'light' ? 'gray.600' : 'gray.400'}>
                   {new Date(app.dateApplied).toLocaleDateString('en-US', {
                     month: 'short',
                     day: 'numeric',
@@ -285,7 +287,7 @@ export function ApplicationsTable({ applications }: ApplicationsTableProps) {
                     Yes
                   </Badge>
                 ) : (
-                  <Text color="gray.500" fontSize="xs">No</Text>
+                  <Text color={colorMode === 'light' ? 'gray.500' : 'gray.400'} fontSize="xs">No</Text>
                 )}
               </Table.Cell>
             </Table.Row>

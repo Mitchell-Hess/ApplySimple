@@ -1,6 +1,7 @@
 'use client';
 
 import { Box, Heading, SimpleGrid, Text, VStack, HStack } from '@chakra-ui/react';
+import { useColorMode } from '@/lib/color-mode';
 import { Stats } from '@/types/application';
 
 interface SourceAnalyticsProps {
@@ -8,6 +9,7 @@ interface SourceAnalyticsProps {
 }
 
 export function SourceAnalytics({ stats }: SourceAnalyticsProps) {
+  const { colorMode } = useColorMode();
   const topSources = stats.sourceCounts.slice(0, 6);
   const maxCount = Math.max(...topSources.map(s => s.count), 1);
 
@@ -30,18 +32,18 @@ export function SourceAnalytics({ stats }: SourceAnalyticsProps) {
   return (
     <Box
       p={{ base: 5, md: 7 }}
-      bg="white"
+      bg={colorMode === 'light' ? 'white' : 'gray.800'}
       borderRadius="2xl"
       borderWidth="1px"
-      borderColor="indigo.100"
+      borderColor={colorMode === 'light' ? 'indigo.100' : 'gray.600'}
       shadow="lg"
     >
       <VStack align="stretch" gap={{ base: 5, md: 6 }}>
         <Box>
-          <Heading size={{ base: "lg", md: "xl" }} color="gray.900" fontWeight="bold" mb={1}>
+          <Heading size={{ base: "lg", md: "xl" }} color={colorMode === 'light' ? 'gray.900' : 'white'} fontWeight="bold" mb={1}>
             Top Application Sources
           </Heading>
-          <Text fontSize={{ base: "sm", md: "md" }} color="gray.600">
+          <Text fontSize={{ base: "sm", md: "md" }} color={colorMode === 'light' ? 'gray.600' : 'gray.400'}>
             Where you're finding the most opportunities
           </Text>
         </Box>
@@ -70,7 +72,7 @@ export function SourceAnalytics({ stats }: SourceAnalyticsProps) {
                 key={source.source}
                 p={{ base: 4, md: 5 }}
                 borderRadius="xl"
-                bg="white"
+                bg={colorMode === 'light' ? 'white' : 'gray.700'}
                 borderWidth="2px"
                 borderColor={`${color}.200`}
                 transition="all 0.3s ease"
@@ -81,11 +83,11 @@ export function SourceAnalytics({ stats }: SourceAnalyticsProps) {
                 }}
               >
                 <HStack justify="space-between" mb={3}>
-                  <Text fontWeight="semibold" fontSize={{ base: "md", md: "lg" }} color="gray.900">
+                  <Text fontWeight="semibold" fontSize={{ base: "md", md: "lg" }} color={colorMode === 'light' ? 'gray.900' : 'white'}>
                     {source.source}
                   </Text>
                   <HStack gap={3}>
-                    <Text fontSize={{ base: "xs", md: "sm" }} color="gray.800" fontWeight="medium">
+                    <Text fontSize={{ base: "xs", md: "sm" }} color={colorMode === 'light' ? 'gray.800' : 'gray.300'} fontWeight="medium">
                       {source.count} apps
                     </Text>
                     <Text fontSize={{ base: "md", md: "lg" }} fontWeight="bold" color={`${color}.600`}>
@@ -93,7 +95,7 @@ export function SourceAnalytics({ stats }: SourceAnalyticsProps) {
                     </Text>
                   </HStack>
                 </HStack>
-                <Box position="relative" h="10px" bg="gray.200" borderRadius="full" overflow="hidden">
+                <Box position="relative" h="10px" bg={colorMode === 'light' ? 'gray.200' : 'gray.600'} borderRadius="full" overflow="hidden">
                   <div
                     style={{
                       position: 'absolute',

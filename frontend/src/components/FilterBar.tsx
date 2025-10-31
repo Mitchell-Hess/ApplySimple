@@ -1,6 +1,7 @@
 'use client';
 
 import { Box, HStack, VStack, Input, Button, Text, SimpleGrid } from '@chakra-ui/react';
+import { useColorMode } from '@/lib/color-mode';
 import { useState } from 'react';
 
 export interface FilterState {
@@ -21,6 +22,7 @@ interface FilterBarProps {
 }
 
 export function FilterBar({ filters, onFilterChange, availableSources, availableStatuses, availableJobTypes }: FilterBarProps) {
+  const { colorMode } = useColorMode();
   const handleInputChange = (field: keyof FilterState, value: string) => {
     onFilterChange({
       ...filters,
@@ -44,17 +46,17 @@ export function FilterBar({ filters, onFilterChange, availableSources, available
   return (
     <Box
       p={{ base: 5, md: 6 }}
-      bg="white"
+      bg={colorMode === 'light' ? 'white' : 'gray.800'}
       borderRadius="2xl"
       borderWidth="1px"
-      borderColor="indigo.100"
+      borderColor={colorMode === 'light' ? 'indigo.100' : 'gray.600'}
       shadow="lg"
       mb={6}
     >
       <VStack align="stretch" gap={5}>
         {/* Search Bar */}
         <Box>
-          <Text fontSize={{ base: "xs", md: "sm" }} fontWeight="semibold" color="gray.700" mb={3}>
+          <Text fontSize={{ base: "xs", md: "sm" }} fontWeight="semibold" color={colorMode === 'light' ? 'gray.700' : 'gray.300'} mb={3}>
             Search Applications
           </Text>
           <Input
@@ -62,13 +64,14 @@ export function FilterBar({ filters, onFilterChange, availableSources, available
             value={filters.search}
             onChange={(e) => handleInputChange('search', e.target.value)}
             size={{ base: "md", md: "lg" }}
-            bg="gray.50"
-            borderColor="gray.300"
+            bg={colorMode === 'light' ? 'gray.50' : 'gray.700'}
+            borderColor={colorMode === 'light' ? 'gray.300' : 'gray.600'}
+            color={colorMode === 'light' ? 'gray.900' : 'white'}
             borderRadius="lg"
             _hover={{ borderColor: 'indigo.300' }}
             _focus={{
               borderColor: 'indigo.500',
-              bg: 'white',
+              bg: colorMode === 'light' ? 'white' : 'gray.600',
               shadow: '0 0 0 3px rgba(99, 102, 241, 0.1)',
             }}
           />
@@ -78,7 +81,7 @@ export function FilterBar({ filters, onFilterChange, availableSources, available
         <SimpleGrid columns={{ base: 1, sm: 2, lg: 5 }} gap={4}>
           {/* Status Filter */}
           <Box>
-            <Text fontSize={{ base: "xs", md: "sm" }} fontWeight="semibold" color="gray.700" mb={2}>
+            <Text fontSize={{ base: "xs", md: "sm" }} fontWeight="semibold" color={colorMode === 'light' ? 'gray.700' : 'gray.300'} mb={2}>
               Status
             </Text>
             <Box
@@ -89,11 +92,12 @@ export function FilterBar({ filters, onFilterChange, availableSources, available
               py={2}
               fontSize="md"
               borderRadius="lg"
-              bg="gray.50"
+              bg={colorMode === 'light' ? 'gray.50' : 'gray.700'}
+              color={colorMode === 'light' ? 'gray.900' : 'white'}
               borderWidth="1px"
-              borderColor="gray.300"
+              borderColor={colorMode === 'light' ? 'gray.300' : 'gray.600'}
               _hover={{ borderColor: 'indigo.300' }}
-              _focus={{ borderColor: 'indigo.500', bg: 'white', outline: 'none', shadow: '0 0 0 3px rgba(99, 102, 241, 0.1)' }}
+              _focus={{ borderColor: 'indigo.500', bg: colorMode === 'light' ? 'white' : 'gray.600', outline: 'none', shadow: '0 0 0 3px rgba(99, 102, 241, 0.1)' }}
               cursor="pointer"
               width="100%"
               height="44px"
@@ -109,7 +113,7 @@ export function FilterBar({ filters, onFilterChange, availableSources, available
 
           {/* Source Filter */}
           <Box>
-            <Text fontSize={{ base: "xs", md: "sm" }} fontWeight="semibold" color="gray.700" mb={2}>
+            <Text fontSize={{ base: "xs", md: "sm" }} fontWeight="semibold" color={colorMode === 'light' ? 'gray.700' : 'gray.300'} mb={2}>
               Source
             </Text>
             <Box
@@ -120,10 +124,11 @@ export function FilterBar({ filters, onFilterChange, availableSources, available
               py={2}
               fontSize="md"
               borderRadius="lg"
-              bg="gray.50"
+              bg={colorMode === 'light' ? 'gray.50' : 'gray.700'}
+              color={colorMode === 'light' ? 'gray.900' : 'white'}
               borderWidth="1px"
-              borderColor="gray.300"
-              _focus={{ borderColor: 'blue.400', bg: 'white', outline: 'none', shadow: '0 0 0 3px rgba(59, 130, 246, 0.1)' }}
+              borderColor={colorMode === 'light' ? 'gray.300' : 'gray.600'}
+              _focus={{ borderColor: 'blue.400', bg: colorMode === 'light' ? 'white' : 'gray.600', outline: 'none', shadow: '0 0 0 3px rgba(59, 130, 246, 0.1)' }}
               cursor="pointer"
               width="100%"
               height="44px"
@@ -139,7 +144,7 @@ export function FilterBar({ filters, onFilterChange, availableSources, available
 
           {/* Job Type Filter */}
           <Box>
-            <Text fontSize={{ base: "xs", md: "sm" }} fontWeight="semibold" color="gray.700" mb={2}>
+            <Text fontSize={{ base: "xs", md: "sm" }} fontWeight="semibold" color={colorMode === 'light' ? 'gray.700' : 'gray.300'} mb={2}>
               Job Type
             </Text>
             <Box
@@ -150,10 +155,11 @@ export function FilterBar({ filters, onFilterChange, availableSources, available
               py={2}
               fontSize="md"
               borderRadius="lg"
-              bg="gray.50"
+              bg={colorMode === 'light' ? 'gray.50' : 'gray.700'}
+              color={colorMode === 'light' ? 'gray.900' : 'white'}
               borderWidth="1px"
-              borderColor="gray.300"
-              _focus={{ borderColor: 'blue.400', bg: 'white', outline: 'none', shadow: '0 0 0 3px rgba(59, 130, 246, 0.1)' }}
+              borderColor={colorMode === 'light' ? 'gray.300' : 'gray.600'}
+              _focus={{ borderColor: 'blue.400', bg: colorMode === 'light' ? 'white' : 'gray.600', outline: 'none', shadow: '0 0 0 3px rgba(59, 130, 246, 0.1)' }}
               cursor="pointer"
               width="100%"
               height="44px"
@@ -169,7 +175,7 @@ export function FilterBar({ filters, onFilterChange, availableSources, available
 
           {/* Date From */}
           <Box>
-            <Text fontSize={{ base: "xs", md: "sm" }} fontWeight="semibold" color="gray.700" mb={2}>
+            <Text fontSize={{ base: "xs", md: "sm" }} fontWeight="semibold" color={colorMode === 'light' ? 'gray.700' : 'gray.300'} mb={2}>
               From Date
             </Text>
             <Input
@@ -177,17 +183,18 @@ export function FilterBar({ filters, onFilterChange, availableSources, available
               value={filters.dateFrom}
               onChange={(e) => handleInputChange('dateFrom', e.target.value)}
               size={{ base: "md", md: "lg" }}
-              bg="gray.50"
-              borderColor="gray.300"
+              bg={colorMode === 'light' ? 'gray.50' : 'gray.700'}
+              color={colorMode === 'light' ? 'gray.900' : 'white'}
+              borderColor={colorMode === 'light' ? 'gray.300' : 'gray.600'}
               borderRadius="lg"
               _hover={{ borderColor: 'indigo.300' }}
-              _focus={{ borderColor: 'indigo.500', bg: 'white', shadow: '0 0 0 3px rgba(99, 102, 241, 0.1)' }}
+              _focus={{ borderColor: 'indigo.500', bg: colorMode === 'light' ? 'white' : 'gray.600', shadow: '0 0 0 3px rgba(99, 102, 241, 0.1)' }}
             />
           </Box>
 
           {/* Date To */}
           <Box>
-            <Text fontSize={{ base: "xs", md: "sm" }} fontWeight="semibold" color="gray.700" mb={2}>
+            <Text fontSize={{ base: "xs", md: "sm" }} fontWeight="semibold" color={colorMode === 'light' ? 'gray.700' : 'gray.300'} mb={2}>
               To Date
             </Text>
             <Input
@@ -195,11 +202,12 @@ export function FilterBar({ filters, onFilterChange, availableSources, available
               value={filters.dateTo}
               onChange={(e) => handleInputChange('dateTo', e.target.value)}
               size={{ base: "md", md: "lg" }}
-              bg="gray.50"
-              borderColor="gray.300"
+              bg={colorMode === 'light' ? 'gray.50' : 'gray.700'}
+              color={colorMode === 'light' ? 'gray.900' : 'white'}
+              borderColor={colorMode === 'light' ? 'gray.300' : 'gray.600'}
               borderRadius="lg"
               _hover={{ borderColor: 'indigo.300' }}
-              _focus={{ borderColor: 'indigo.500', bg: 'white', shadow: '0 0 0 3px rgba(99, 102, 241, 0.1)' }}
+              _focus={{ borderColor: 'indigo.500', bg: colorMode === 'light' ? 'white' : 'gray.600', shadow: '0 0 0 3px rgba(99, 102, 241, 0.1)' }}
             />
           </Box>
         </SimpleGrid>
