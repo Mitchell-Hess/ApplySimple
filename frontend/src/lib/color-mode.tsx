@@ -13,18 +13,18 @@ interface ColorModeContextType {
 const ColorModeContext = createContext<ColorModeContextType | undefined>(undefined);
 
 export function ColorModeProvider({ children }: { children: ReactNode }) {
-  // Always initialize with 'light' to match SSR, then update from localStorage after hydration
+  // Always initialize with 'light' to match SSR
   const [colorMode, setColorModeState] = useState<ColorMode>('light');
-  const [isHydrated, setIsHydrated] = useState(false);
 
   useEffect(() => {
-    // After hydration, read from localStorage and update state
+    // After hydration, read and apply saved color mode from localStorage
     const saved = localStorage.getItem('chakra-ui-color-mode') as ColorMode | null;
-    if (saved && saved !== colorMode) {
+    if (saved) {
+      // Only update if there's a saved preference and it differs from default
       setColorModeState(saved);
+      document.documentElement.classList.add('dark');
     }
-    document.documentElement.classList.toggle('dark', (saved || 'light') === 'dark');
-    setIsHydrated(true);
+    // eslint-disable-next-line react-hooks/set-state-in-effect
   }, []);
 
   const setColorMode = (mode: ColorMode) => {
