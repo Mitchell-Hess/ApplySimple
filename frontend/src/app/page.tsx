@@ -12,6 +12,9 @@ import { SalaryInsights } from '@/components/SalaryInsights';
 import { FilterBar, FilterState } from '@/components/FilterBar';
 import { ColorModeToggle } from '@/components/ColorModeToggle';
 import { ApplicationFormModal } from '@/components/ApplicationFormModal';
+import { ImportModal } from '@/components/ImportModal';
+import { ConfirmDialog } from '@/components/ConfirmDialog';
+import { AlertDialog } from '@/components/AlertDialog';
 import { useColorMode } from '@/lib/color-mode';
 import { useState, useMemo, useEffect, useRef } from 'react';
 import { Application, PredictionResponse } from '@/types/application';
@@ -43,10 +46,36 @@ export default function Home() {
   const [predictions, setPredictions] = useState<Map<string, PredictionResponse>>(new Map());
   const loadingRef = useRef(false);
 
-  // Modal state for add/edit
+  // Modal state for add/edit/import
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const [editingApplication, setEditingApplication] = useState<Application | null>(null);
   const [isNormalizing, setIsNormalizing] = useState(false);
+
+  // Dialog state
+  const [confirmDialog, setConfirmDialog] = useState<{
+    isOpen: boolean;
+    title: string;
+    message: string;
+    onConfirm: () => void;
+  }>({
+    isOpen: false,
+    title: '',
+    message: '',
+    onConfirm: () => {},
+  });
+
+  const [alertDialog, setAlertDialog] = useState<{
+    isOpen: boolean;
+    title: string;
+    message: string;
+    type: 'success' | 'error' | 'info';
+  }>({
+    isOpen: false,
+    title: '',
+    message: '',
+    type: 'info',
+  });
 
   // Handlers for CRUD operations
   const handleAdd = () => {
@@ -59,20 +88,35 @@ export default function Home() {
     setIsModalOpen(true);
   };
 
-  const handleDelete = async (applicationId: string) => {
-    if (!window.confirm('Are you sure you want to delete this application?')) {
-      return;
-    }
-
-    try {
-      await deleteApplication(applicationId);
-      // Invalidate queries to refetch data
-      queryClient.invalidateQueries({ queryKey: ['applications'] });
-      queryClient.invalidateQueries({ queryKey: ['stats'] });
-    } catch (error) {
-      console.error('Failed to delete application:', error);
-      alert('Failed to delete application. Please try again.');
-    }
+  const handleDelete = (applicationId: string) => {
+    setConfirmDialog({
+      isOpen: true,
+      title: 'Delete Application',
+      message: 'Are you sure you want to delete this application? This action cannot be undone.',
+      onConfirm: async () => {
+        setConfirmDialog({ ...confirmDialog, isOpen: false });
+        try {
+          await deleteApplication(applicationId);
+          // Invalidate queries to refetch data
+          queryClient.invalidateQueries({ queryKey: ['applications'] });
+          queryClient.invalidateQueries({ queryKey: ['stats'] });
+          setAlertDialog({
+            isOpen: true,
+            title: 'Success',
+            message: 'Application deleted successfully.',
+            type: 'success',
+          });
+        } catch (error) {
+          console.error('Failed to delete application:', error);
+          setAlertDialog({
+            isOpen: true,
+            title: 'Error',
+            message: 'Failed to delete application. Please try again.',
+            type: 'error',
+          });
+        }
+      },
+    });
   };
 
   const handleModalSuccess = () => {
@@ -81,33 +125,60 @@ export default function Home() {
     queryClient.invalidateQueries({ queryKey: ['stats'] });
   };
 
-  const handleNormalizeData = async () => {
-    if (!window.confirm('This will normalize all existing data (job types, statuses, sources, etc.). Continue?')) {
-      return;
-    }
+  const handleImportSuccess = (message: string) => {
+    // Invalidate queries to refetch data after import
+    queryClient.invalidateQueries({ queryKey: ['applications'] });
+    queryClient.invalidateQueries({ queryKey: ['stats'] });
+    // Show success dialog
+    setAlertDialog({
+      isOpen: true,
+      title: 'Import Complete',
+      message,
+      type: 'success',
+    });
+  };
 
-    setIsNormalizing(true);
-    try {
-      const response = await fetch('/api/normalize-data', {
-        method: 'POST',
-      });
+  const handleNormalizeData = () => {
+    setConfirmDialog({
+      isOpen: true,
+      title: 'Normalize Data',
+      message: 'This will normalize all existing data (job types, statuses, sources, company names, etc.). This process cannot be undone. Continue?',
+      onConfirm: async () => {
+        setConfirmDialog({ ...confirmDialog, isOpen: false });
+        setIsNormalizing(true);
+        try {
+          const response = await fetch('/api/normalize-data', {
+            method: 'POST',
+          });
 
-      if (!response.ok) {
-        throw new Error('Failed to normalize data');
-      }
+          if (!response.ok) {
+            throw new Error('Failed to normalize data');
+          }
 
-      const result = await response.json();
-      alert(result.message);
+          const result = await response.json();
+          setAlertDialog({
+            isOpen: true,
+            title: 'Success',
+            message: result.message,
+            type: 'success',
+          });
 
-      // Refresh data
-      queryClient.invalidateQueries({ queryKey: ['applications'] });
-      queryClient.invalidateQueries({ queryKey: ['stats'] });
-    } catch (error) {
-      console.error('Normalization error:', error);
-      alert('Failed to normalize data. Please try again.');
-    } finally {
-      setIsNormalizing(false);
-    }
+          // Refresh data
+          queryClient.invalidateQueries({ queryKey: ['applications'] });
+          queryClient.invalidateQueries({ queryKey: ['stats'] });
+        } catch (error) {
+          console.error('Normalization error:', error);
+          setAlertDialog({
+            isOpen: true,
+            title: 'Error',
+            message: 'Failed to normalize data. Please try again.',
+            type: 'error',
+          });
+        } finally {
+          setIsNormalizing(false);
+        }
+      },
+    });
   };
 
   // Generate ML predictions when applications are loaded
@@ -534,6 +605,15 @@ export default function Home() {
                   >
                     <LuPlus /> Add Application
                   </Button>
+                  <Button
+                    onClick={() => setIsImportModalOpen(true)}
+                    bg="blue.600"
+                    color="white"
+                    _hover={{ bg: 'blue.700' }}
+                    size={{ base: "sm", md: "md" }}
+                  >
+                    Import CSV
+                  </Button>
                   <Badge
                     px={{ base: 4, md: 5 }}
                     py={2}
@@ -583,6 +663,34 @@ export default function Home() {
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onSuccess={handleModalSuccess}
+      />
+
+      {/* Import Modal */}
+      <ImportModal
+        isOpen={isImportModalOpen}
+        onClose={() => setIsImportModalOpen(false)}
+        onSuccess={handleImportSuccess}
+      />
+
+      {/* Confirm Dialog */}
+      <ConfirmDialog
+        isOpen={confirmDialog.isOpen}
+        title={confirmDialog.title}
+        message={confirmDialog.message}
+        confirmText="Confirm"
+        cancelText="Cancel"
+        confirmColor="red.600"
+        onConfirm={confirmDialog.onConfirm}
+        onCancel={() => setConfirmDialog({ ...confirmDialog, isOpen: false })}
+      />
+
+      {/* Alert Dialog */}
+      <AlertDialog
+        isOpen={alertDialog.isOpen}
+        title={alertDialog.title}
+        message={alertDialog.message}
+        type={alertDialog.type}
+        onClose={() => setAlertDialog({ ...alertDialog, isOpen: false })}
       />
     </Box>
   );
