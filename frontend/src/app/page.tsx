@@ -1,8 +1,8 @@
 'use client';
 
-import { Box, Container, Heading, SimpleGrid, Spinner, Text, VStack, HStack, Badge } from '@chakra-ui/react';
-import { useQuery } from '@tanstack/react-query';
-import { fetchApplications, fetchStats, generatePredictions } from '@/lib/api';
+import { Box, Container, Heading, SimpleGrid, Spinner, Text, VStack, HStack, Badge, Button } from '@chakra-ui/react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { fetchApplications, fetchStats, generatePredictions, deleteApplication } from '@/lib/api';
 import { StatsCard } from '@/components/StatsCard';
 import { ApplicationsTable } from '@/components/ApplicationsTable';
 import { StatusChart } from '@/components/StatusChart';
@@ -10,12 +10,16 @@ import { SourceAnalytics } from '@/components/SourceAnalytics';
 import { MLInsights } from '@/components/MLInsights';
 import { FilterBar, FilterState } from '@/components/FilterBar';
 import { ColorModeToggle } from '@/components/ColorModeToggle';
+import { ApplicationFormModal } from '@/components/ApplicationFormModal';
 import { useColorMode } from '@/lib/color-mode';
 import { useState, useMemo, useEffect, useRef } from 'react';
 import { Application, PredictionResponse } from '@/types/application';
+import { LuPlus } from 'react-icons/lu';
 
 export default function Home() {
   const { colorMode } = useColorMode();
+  const queryClient = useQueryClient();
+
   const { data: applications, isLoading: appsLoading, error: appsError } = useQuery({
     queryKey: ['applications'],
     queryFn: fetchApplications,
@@ -37,6 +41,43 @@ export default function Home() {
 
   const [predictions, setPredictions] = useState<Map<string, PredictionResponse>>(new Map());
   const loadingRef = useRef(false);
+
+  // Modal state for add/edit
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingApplication, setEditingApplication] = useState<Application | null>(null);
+
+  // Handlers for CRUD operations
+  const handleAdd = () => {
+    setEditingApplication(null);
+    setIsModalOpen(true);
+  };
+
+  const handleEdit = (application: Application) => {
+    setEditingApplication(application);
+    setIsModalOpen(true);
+  };
+
+  const handleDelete = async (applicationId: string) => {
+    if (!window.confirm('Are you sure you want to delete this application?')) {
+      return;
+    }
+
+    try {
+      await deleteApplication(applicationId);
+      // Invalidate queries to refetch data
+      queryClient.invalidateQueries({ queryKey: ['applications'] });
+      queryClient.invalidateQueries({ queryKey: ['stats'] });
+    } catch (error) {
+      console.error('Failed to delete application:', error);
+      alert('Failed to delete application. Please try again.');
+    }
+  };
+
+  const handleModalSuccess = () => {
+    // Invalidate queries to refetch data
+    queryClient.invalidateQueries({ queryKey: ['applications'] });
+    queryClient.invalidateQueries({ queryKey: ['stats'] });
+  };
 
   // Generate ML predictions when applications are loaded
   useEffect(() => {
@@ -441,6 +482,15 @@ export default function Home() {
                   </Text>
                 </Box>
                 <HStack gap={{ base: 2, md: 3 }} flexWrap="wrap">
+                  <Button
+                    onClick={handleAdd}
+                    bg="green.600"
+                    color="white"
+                    _hover={{ bg: 'green.700' }}
+                    size={{ base: "sm", md: "md" }}
+                  >
+                    <LuPlus /> Add Application
+                  </Button>
                   <Badge
                     px={{ base: 4, md: 5 }}
                     py={2}
@@ -475,10 +525,22 @@ export default function Home() {
               availableJobTypes={availableJobTypes}
             />
 
-            <ApplicationsTable applications={filteredApplications} />
+            <ApplicationsTable
+              applications={filteredApplications}
+              onEdit={handleEdit}
+              onDelete={handleDelete}
+            />
           </Box>
         </VStack>
       </Container>
+
+      {/* Application Form Modal */}
+      <ApplicationFormModal
+        application={editingApplication}
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSuccess={handleModalSuccess}
+      />
     </Box>
   );
 }

@@ -32,6 +32,29 @@ export async function createApplication(data: Partial<Application>): Promise<App
   return response.json();
 }
 
+export async function updateApplication(id: string, data: Partial<Application>): Promise<Application> {
+  const response = await fetch(`${API_BASE}/applications`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ id, ...data }),
+  });
+  if (!response.ok) {
+    throw new Error('Failed to update application');
+  }
+  return response.json();
+}
+
+export async function deleteApplication(id: string): Promise<void> {
+  const response = await fetch(`${API_BASE}/applications?id=${id}`, {
+    method: 'DELETE',
+  });
+  if (!response.ok) {
+    throw new Error('Failed to delete application');
+  }
+}
+
 export async function predictSuccess(data: PredictionRequest): Promise<PredictionResponse> {
   const response = await fetch(`${API_BASE}/predict`, {
     method: 'POST',
