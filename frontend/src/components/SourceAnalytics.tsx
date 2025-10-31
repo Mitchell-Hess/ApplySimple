@@ -11,7 +11,6 @@ interface SourceAnalyticsProps {
 export function SourceAnalytics({ stats }: SourceAnalyticsProps) {
   const { colorMode } = useColorMode();
   const topSources = stats.sourceCounts.slice(0, 6);
-  const maxCount = Math.max(...topSources.map(s => s.count), 1);
 
   const colors = ['emerald', 'blue', 'purple', 'orange', 'pink', 'teal'];
 
@@ -44,7 +43,7 @@ export function SourceAnalytics({ stats }: SourceAnalyticsProps) {
             Top Application Sources
           </Heading>
           <Text fontSize={{ base: "sm", md: "md" }} color={colorMode === 'light' ? 'gray.600' : 'gray.400'}>
-            Where you're finding the most opportunities
+            Where you&apos;re finding the most opportunities
           </Text>
         </Box>
         <SimpleGrid columns={{ base: 1, md: 2 }} gap={{ base: 4, md: 5 }}>

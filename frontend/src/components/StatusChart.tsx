@@ -1,7 +1,7 @@
 'use client';
 
 import { Box, SimpleGrid, VStack, Text, HStack } from '@chakra-ui/react';
-import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 import { useColorMode } from '@/lib/color-mode';
 import { Application } from '@/types/application';
 
@@ -62,7 +62,7 @@ export function StatusChart({ applications }: StatusChartProps) {
                 stroke: '#9ca3af',
                 strokeWidth: 1.5,
               }}
-              label={(props: any) => {
+              label={(props: { cx: number; cy: number; midAngle: number; outerRadius: number; name: string; percent: number; value: number }) => {
                 const RADIAN = Math.PI / 180;
                 const { cx, cy, midAngle, outerRadius, name, percent, value } = props;
                 const radius = outerRadius + 35;

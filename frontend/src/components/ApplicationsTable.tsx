@@ -28,6 +28,24 @@ const jobTypeColors: Record<string, string> = {
   'On-site': 'purple',
 };
 
+// SortIcon component defined outside of render to avoid React hooks warnings
+interface SortIconProps {
+  field: SortField;
+  currentField: SortField | null;
+  currentDirection: SortDirection;
+  colorMode: 'light' | 'dark';
+}
+
+function SortIcon({ field, currentField, currentDirection, colorMode }: SortIconProps) {
+  if (currentField !== field) {
+    return <Icon fontSize="sm" color={colorMode === 'light' ? 'gray.400' : 'gray.500'}><LuArrowUpDown /></Icon>;
+  }
+  if (currentDirection === 'asc') {
+    return <Icon fontSize="sm" color="blue.600"><LuArrowUp /></Icon>;
+  }
+  return <Icon fontSize="sm" color="blue.600"><LuArrowDown /></Icon>;
+}
+
 export function ApplicationsTable({ applications }: ApplicationsTableProps) {
   const { colorMode } = useColorMode();
   const [showAll, setShowAll] = useState(false);
@@ -53,8 +71,8 @@ export function ApplicationsTable({ applications }: ApplicationsTableProps) {
     if (!sortField || !sortDirection) return applications;
 
     return [...applications].sort((a, b) => {
-      let aVal: any;
-      let bVal: any;
+      let aVal: string | number;
+      let bVal: string | number;
 
       switch (sortField) {
         case 'company':
@@ -90,16 +108,6 @@ export function ApplicationsTable({ applications }: ApplicationsTableProps) {
 
   const displayedApps = showAll ? sortedApplications : sortedApplications.slice(0, 10);
 
-  const SortIcon = ({ field }: { field: SortField }) => {
-    if (sortField !== field) {
-      return <Icon fontSize="sm" color={colorMode === 'light' ? 'gray.400' : 'gray.500'}><LuArrowUpDown /></Icon>;
-    }
-    if (sortDirection === 'asc') {
-      return <Icon fontSize="sm" color="blue.600"><LuArrowUp /></Icon>;
-    }
-    return <Icon fontSize="sm" color="blue.600"><LuArrowDown /></Icon>;
-  };
-
   if (applications.length === 0) {
     return (
       <Box p={{ base: 6, md: 8 }} textAlign="center" color={colorMode === 'light' ? 'gray.500' : 'gray.400'} bg={colorMode === 'light' ? 'white' : 'gray.800'} borderRadius="xl" borderWidth="1px" borderColor={colorMode === 'light' ? 'gray.200' : 'gray.600'}>
@@ -132,7 +140,7 @@ export function ApplicationsTable({ applications }: ApplicationsTableProps) {
               >
                 <HStack gap={1}>
                   <Text>Company</Text>
-                  <SortIcon field="company" />
+                  <SortIcon field="company" currentField={sortField} currentDirection={sortDirection} colorMode={colorMode} />
                 </HStack>
               </Table.ColumnHeader>
               <Table.ColumnHeader
@@ -146,7 +154,7 @@ export function ApplicationsTable({ applications }: ApplicationsTableProps) {
               >
                 <HStack gap={1}>
                   <Text>Job Title</Text>
-                  <SortIcon field="jobTitle" />
+                  <SortIcon field="jobTitle" currentField={sortField} currentDirection={sortDirection} colorMode={colorMode} />
                 </HStack>
               </Table.ColumnHeader>
               <Table.ColumnHeader fontWeight="semibold" color="gray.700" fontSize="xs">Type</Table.ColumnHeader>
@@ -161,7 +169,7 @@ export function ApplicationsTable({ applications }: ApplicationsTableProps) {
               >
                 <HStack gap={1}>
                   <Text>Salary</Text>
-                  <SortIcon field="salary" />
+                  <SortIcon field="salary" currentField={sortField} currentDirection={sortDirection} colorMode={colorMode} />
                 </HStack>
               </Table.ColumnHeader>
               <Table.ColumnHeader
@@ -175,7 +183,7 @@ export function ApplicationsTable({ applications }: ApplicationsTableProps) {
               >
                 <HStack gap={1}>
                   <Text>Status</Text>
-                  <SortIcon field="status" />
+                  <SortIcon field="status" currentField={sortField} currentDirection={sortDirection} colorMode={colorMode} />
                 </HStack>
               </Table.ColumnHeader>
               <Table.ColumnHeader fontWeight="semibold" color="gray.700" fontSize="xs">Rounds</Table.ColumnHeader>
@@ -191,7 +199,7 @@ export function ApplicationsTable({ applications }: ApplicationsTableProps) {
               >
                 <HStack gap={1}>
                   <Text>Applied</Text>
-                  <SortIcon field="dateApplied" />
+                  <SortIcon field="dateApplied" currentField={sortField} currentDirection={sortDirection} colorMode={colorMode} />
                 </HStack>
               </Table.ColumnHeader>
               <Table.ColumnHeader fontWeight="semibold" color="gray.700" fontSize="xs">Cover Letter</Table.ColumnHeader>

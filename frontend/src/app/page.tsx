@@ -1,6 +1,6 @@
 'use client';
 
-import { Box, Container, Grid, GridItem, Heading, SimpleGrid, Spinner, Text, VStack, HStack, Badge, Flex, Icon } from '@chakra-ui/react';
+import { Box, Container, Heading, SimpleGrid, Spinner, Text, VStack, HStack, Badge } from '@chakra-ui/react';
 import { useQuery } from '@tanstack/react-query';
 import { fetchApplications, fetchStats, generatePredictions } from '@/lib/api';
 import { StatsCard } from '@/components/StatsCard';
