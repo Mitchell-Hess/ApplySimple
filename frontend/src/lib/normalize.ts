@@ -8,23 +8,28 @@ export function normalizeJobType(jobType: string | null | undefined): string {
 
   const normalized = jobType.toLowerCase().trim();
 
-  // Remote variations
-  if (normalized.match(/^(remote|wfh|work from home|100% remote|fully remote)$/)) {
-    return 'Remote';
+  // Check for uncertainty indicators (question marks, "unsure", etc.)
+  if (normalized.includes('?') || normalized.match(/unsure|unknown|tbd|to be determined/)) {
+    return 'Unsure';
   }
 
-  // Hybrid variations
-  if (normalized.match(/^(hybrid|flex|flexible|part remote|partially remote)$/)) {
+  // Hybrid variations (check before remote since "remote or hybrid" should be hybrid)
+  if (normalized.match(/hybrid|flex|flexible|part remote|partially remote|remote or hybrid|remote\/hybrid/)) {
     return 'Hybrid';
   }
 
+  // Remote variations
+  if (normalized.match(/remote|wfh|work from home|100% remote|fully remote/)) {
+    return 'Remote';
+  }
+
   // On-site variations
-  if (normalized.match(/^(on-site|onsite|on site|in-office|in office|office)$/)) {
+  if (normalized.match(/on-site|onsite|on site|in-office|in office|office|in person/)) {
     return 'On-site';
   }
 
-  // Default to original value if no match (capitalized)
-  return jobType.charAt(0).toUpperCase() + jobType.slice(1).toLowerCase();
+  // Default to Unsure if no match
+  return 'Unsure';
 }
 
 // Normalize status to standard values
