@@ -19,10 +19,12 @@ import { useColorMode } from '@/lib/color-mode';
 import { useState, useMemo, useEffect, useRef } from 'react';
 import { Application, PredictionResponse } from '@/types/application';
 import { LuPlus } from 'react-icons/lu';
+import { useSession, signOut } from 'next-auth/react';
 
 export default function Home() {
   const { colorMode } = useColorMode();
   const queryClient = useQueryClient();
+  const { data: session } = useSession();
 
   const { data: applications, isLoading: appsLoading, error: appsError } = useQuery({
     queryKey: ['applications'],
@@ -362,6 +364,11 @@ export default function Home() {
                 </Text>
               </Box>
               <HStack gap={{ base: 2, md: 3 }} flexWrap="wrap">
+                {session?.user && (
+                  <Text fontSize="sm" color={colorMode === 'light' ? 'gray.600' : 'gray.400'}>
+                    {session.user.email}
+                  </Text>
+                )}
                 <ColorModeToggle />
                 <Button
                   onClick={handleNormalizeData}
@@ -371,6 +378,14 @@ export default function Home() {
                   disabled={isNormalizing}
                 >
                   {isNormalizing ? 'Normalizing...' : 'Normalize Data'}
+                </Button>
+                <Button
+                  onClick={() => signOut()}
+                  size="sm"
+                  variant="outline"
+                  colorPalette="red"
+                >
+                  Sign Out
                 </Button>
                 <Badge
                   px={{ base: 4, md: 5 }}
