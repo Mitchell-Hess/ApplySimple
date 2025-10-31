@@ -1,13 +1,15 @@
 'use client';
 
-import { Box, Table, Badge, Text, HStack, Link, Button, Icon } from '@chakra-ui/react';
+import { Box, Table, Badge, Text, HStack, Link, Button, Icon, IconButton } from '@chakra-ui/react';
 import { useColorMode } from '@/lib/color-mode';
 import { Application } from '@/types/application';
 import { useState, useMemo } from 'react';
-import { LuArrowUp, LuArrowDown, LuArrowUpDown } from 'react-icons/lu';
+import { LuArrowUp, LuArrowDown, LuArrowUpDown, LuPencil, LuTrash2 } from 'react-icons/lu';
 
 interface ApplicationsTableProps {
   applications: Application[];
+  onEdit?: (application: Application) => void;
+  onDelete?: (applicationId: string) => void;
 }
 
 type SortField = 'company' | 'jobTitle' | 'dateApplied' | 'status' | 'salary';
@@ -46,7 +48,7 @@ function SortIcon({ field, currentField, currentDirection, colorMode }: SortIcon
   return <Icon fontSize="sm" color="blue.600"><LuArrowDown /></Icon>;
 }
 
-export function ApplicationsTable({ applications }: ApplicationsTableProps) {
+export function ApplicationsTable({ applications, onEdit, onDelete }: ApplicationsTableProps) {
   const { colorMode } = useColorMode();
   const [showAll, setShowAll] = useState(false);
   const [sortField, setSortField] = useState<SortField | null>(null);
@@ -203,6 +205,9 @@ export function ApplicationsTable({ applications }: ApplicationsTableProps) {
                 </HStack>
               </Table.ColumnHeader>
               <Table.ColumnHeader fontWeight="semibold" color="gray.700" fontSize="xs">Cover Letter</Table.ColumnHeader>
+              {(onEdit || onDelete) && (
+                <Table.ColumnHeader fontWeight="semibold" color="gray.700" fontSize="xs">Actions</Table.ColumnHeader>
+              )}
             </Table.Row>
           </Table.Header>
           <Table.Body>
@@ -298,6 +303,34 @@ export function ApplicationsTable({ applications }: ApplicationsTableProps) {
                   <Text color={colorMode === 'light' ? 'gray.500' : 'gray.400'} fontSize="xs">No</Text>
                 )}
               </Table.Cell>
+              {(onEdit || onDelete) && (
+                <Table.Cell>
+                  <HStack gap={1}>
+                    {onEdit && (
+                      <IconButton
+                        aria-label="Edit application"
+                        size="sm"
+                        variant="ghost"
+                        colorPalette="blue"
+                        onClick={() => onEdit(app)}
+                      >
+                        <LuPencil />
+                      </IconButton>
+                    )}
+                    {onDelete && (
+                      <IconButton
+                        aria-label="Delete application"
+                        size="sm"
+                        variant="ghost"
+                        colorPalette="red"
+                        onClick={() => onDelete(app.id)}
+                      >
+                        <LuTrash2 />
+                      </IconButton>
+                    )}
+                  </HStack>
+                </Table.Cell>
+              )}
             </Table.Row>
           ))}
         </Table.Body>

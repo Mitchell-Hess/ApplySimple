@@ -19,11 +19,18 @@ export function ColorModeProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     // After hydration, read and apply saved color mode from localStorage
     const saved = localStorage.getItem('chakra-ui-color-mode') as ColorMode | null;
-    if (saved) {
-      // Only update if there's a saved preference and it differs from default
-      setColorModeState(saved);
+    const mode = saved || 'light';
+
+    // Always update state and DOM to match
+    setColorModeState(mode);
+
+    // Ensure we properly set or remove the dark class
+    if (mode === 'dark') {
       document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
     }
+
     // eslint-disable-next-line react-hooks/set-state-in-effect
   }, []);
 
