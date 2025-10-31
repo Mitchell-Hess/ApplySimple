@@ -2,16 +2,17 @@
 
 import { Box, Container, Grid, GridItem, Heading, SimpleGrid, Spinner, Text, VStack, HStack, Badge, Flex, Icon } from '@chakra-ui/react';
 import { useQuery } from '@tanstack/react-query';
-import { fetchApplications, fetchStats } from '@/lib/api';
+import { fetchApplications, fetchStats, generatePredictions } from '@/lib/api';
 import { StatsCard } from '@/components/StatsCard';
 import { ApplicationsTable } from '@/components/ApplicationsTable';
 import { StatusChart } from '@/components/StatusChart';
 import { SourceAnalytics } from '@/components/SourceAnalytics';
+import { MLInsights } from '@/components/MLInsights';
 import { FilterBar, FilterState } from '@/components/FilterBar';
 import { ColorModeToggle } from '@/components/ColorModeToggle';
 import { useColorMode } from '@/lib/color-mode';
-import { useState, useMemo } from 'react';
-import { Application } from '@/types/application';
+import { useState, useMemo, useEffect } from 'react';
+import { Application, PredictionResponse } from '@/types/application';
 
 export default function Home() {
   const { colorMode } = useColorMode();
@@ -33,6 +34,26 @@ export default function Home() {
     dateFrom: '',
     dateTo: '',
   });
+
+  const [predictions, setPredictions] = useState<Map<string, PredictionResponse>>(new Map());
+  const [loadingPredictions, setLoadingPredictions] = useState(false);
+
+  // Generate ML predictions when applications are loaded
+  useEffect(() => {
+    if (applications && applications.length > 0 && predictions.size === 0 && !loadingPredictions) {
+      setLoadingPredictions(true);
+      generatePredictions(applications)
+        .then((newPredictions) => {
+          setPredictions(newPredictions);
+        })
+        .catch((error) => {
+          console.error('Failed to generate predictions:', error);
+        })
+        .finally(() => {
+          setLoadingPredictions(false);
+        });
+    }
+  }, [applications, predictions.size, loadingPredictions]);
 
   // Get unique values for filter dropdowns
   const availableSources = useMemo(() => {
@@ -395,6 +416,9 @@ export default function Home() {
 
           {/* Analytics Section */}
           {stats && <SourceAnalytics stats={stats} />}
+
+          {/* ML Insights Section */}
+          {applications && <MLInsights applications={applications} predictions={predictions} />}
 
           {/* Applications Table */}
           <Box>
