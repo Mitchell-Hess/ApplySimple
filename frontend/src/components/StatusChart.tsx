@@ -2,6 +2,7 @@
 
 import { Box, SimpleGrid, VStack, Text, HStack } from '@chakra-ui/react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
+import { useColorMode } from '@/lib/color-mode';
 import { Application } from '@/types/application';
 
 interface StatusChartProps {
@@ -18,6 +19,8 @@ const COLORS = {
 };
 
 export function StatusChart({ applications }: StatusChartProps) {
+  const { colorMode } = useColorMode();
+
   // Count applications by status
   const statusCounts = applications.reduce((acc, app) => {
     acc[app.status] = (acc[app.status] || 0) + 1;
@@ -31,7 +34,7 @@ export function StatusChart({ applications }: StatusChartProps) {
 
   if (data.length === 0) {
     return (
-      <Box p={8} textAlign="center" color="gray.500">
+      <Box p={8} textAlign="center" color={colorMode === 'light' ? 'gray.500' : 'gray.400'}>
         No data to display
       </Box>
     );
@@ -44,10 +47,10 @@ export function StatusChart({ applications }: StatusChartProps) {
       {/* Pie Chart */}
       <Box
         p={{ base: 3, md: 4 }}
-        bg="white"
+        bg={colorMode === 'light' ? 'white' : 'gray.700'}
         borderRadius="lg"
         borderWidth="1px"
-        borderColor="gray.300"
+        borderColor={colorMode === 'light' ? 'gray.300' : 'gray.600'}
       >
         <ResponsiveContainer width="100%" height={400}>
           <PieChart margin={{ top: 15, right: 70, bottom: 15, left: 70 }}>
@@ -71,7 +74,7 @@ export function StatusChart({ applications }: StatusChartProps) {
                     <text
                       x={x}
                       y={y - 10}
-                      fill="#1f2937"
+                      fill={colorMode === 'light' ? '#1f2937' : '#f3f4f6'}
                       textAnchor={x > cx ? 'start' : 'end'}
                       dominantBaseline="central"
                       fontWeight="800"
@@ -83,7 +86,7 @@ export function StatusChart({ applications }: StatusChartProps) {
                     <text
                       x={x}
                       y={y + 10}
-                      fill="#6b7280"
+                      fill={colorMode === 'light' ? '#6b7280' : '#d1d5db'}
                       textAnchor={x > cx ? 'start' : 'end'}
                       dominantBaseline="central"
                       fontWeight="600"
@@ -112,14 +115,14 @@ export function StatusChart({ applications }: StatusChartProps) {
             </Pie>
             <Tooltip
               contentStyle={{
-                backgroundColor: 'white',
-                border: '1px solid #e5e7eb',
+                backgroundColor: colorMode === 'light' ? 'white' : '#374151',
+                border: colorMode === 'light' ? '1px solid #e5e7eb' : '1px solid #4b5563',
                 borderRadius: '8px',
                 padding: '10px 14px',
                 boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
               }}
               itemStyle={{
-                color: '#1f2937',
+                color: colorMode === 'light' ? '#1f2937' : '#f3f4f6',
                 fontWeight: '600'
               }}
             />
@@ -135,10 +138,10 @@ export function StatusChart({ applications }: StatusChartProps) {
             <Box
               key={item.name}
               p={{ base: 3, md: 4 }}
-              bg="white"
+              bg={colorMode === 'light' ? 'white' : 'gray.700'}
               borderRadius="lg"
               borderWidth="1px"
-              borderColor="gray.200"
+              borderColor={colorMode === 'light' ? 'gray.200' : 'gray.600'}
               shadow="sm"
               transition="all 0.2s"
               _hover={{ shadow: 'md', borderColor: COLORS[item.name as keyof typeof COLORS] }}
@@ -151,15 +154,15 @@ export function StatusChart({ applications }: StatusChartProps) {
                     borderRadius="md"
                     bg={COLORS[item.name as keyof typeof COLORS]}
                   />
-                  <Text fontWeight="semibold" color="gray.900" fontSize={{ base: "sm", md: "md" }}>
+                  <Text fontWeight="semibold" color={colorMode === 'light' ? 'gray.900' : 'white'} fontSize={{ base: "sm", md: "md" }}>
                     {item.name}
                   </Text>
                 </HStack>
                 <HStack gap={{ base: 3, md: 4 }}>
-                  <Text fontSize={{ base: "xs", md: "sm" }} color="gray.800" fontWeight="medium">
+                  <Text fontSize={{ base: "xs", md: "sm" }} color={colorMode === 'light' ? 'gray.800' : 'gray.300'} fontWeight="medium">
                     {item.value} apps
                   </Text>
-                  <Text fontSize={{ base: "sm", md: "md" }} fontWeight="bold" color="gray.900" minW="50px" textAlign="right">
+                  <Text fontSize={{ base: "sm", md: "md" }} fontWeight="bold" color={colorMode === 'light' ? 'gray.900' : 'white'} minW="50px" textAlign="right">
                     {percentage}%
                   </Text>
                 </HStack>

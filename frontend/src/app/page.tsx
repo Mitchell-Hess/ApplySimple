@@ -8,10 +8,13 @@ import { ApplicationsTable } from '@/components/ApplicationsTable';
 import { StatusChart } from '@/components/StatusChart';
 import { SourceAnalytics } from '@/components/SourceAnalytics';
 import { FilterBar, FilterState } from '@/components/FilterBar';
+import { ColorModeToggle } from '@/components/ColorModeToggle';
+import { useColorMode } from '@/lib/color-mode';
 import { useState, useMemo } from 'react';
 import { Application } from '@/types/application';
 
 export default function Home() {
+  const { colorMode } = useColorMode();
   const { data: applications, isLoading: appsLoading, error: appsError } = useQuery({
     queryKey: ['applications'],
     queryFn: fetchApplications,
@@ -102,10 +105,19 @@ export default function Home() {
 
   if (isLoading) {
     return (
-      <Box minH="100vh" display="flex" alignItems="center" justifyContent="center" bg="linear-gradient(135deg, #f0fdf4 0%, #fef3f2 100%)">
+      <Box
+        minH="100vh"
+        display="flex"
+        alignItems="center"
+        justifyContent="center"
+        bg={colorMode === 'light'
+          ? 'linear-gradient(135deg, #f0fdf4 0%, #fef3f2 100%)'
+          : 'linear-gradient(135deg, #1a202c 0%, #2d3748 100%)'
+        }
+      >
         <VStack gap={4}>
           <Spinner size="xl" color="blue.500" />
-          <Text color="gray.600">Loading your applications...</Text>
+          <Text color={colorMode === 'light' ? 'gray.600' : 'gray.300'}>Loading your applications...</Text>
         </VStack>
       </Box>
     );
@@ -113,11 +125,20 @@ export default function Home() {
 
   if (error) {
     return (
-      <Box minH="100vh" display="flex" alignItems="center" justifyContent="center" bg="linear-gradient(135deg, #f0fdf4 0%, #fef3f2 100%)">
+      <Box
+        minH="100vh"
+        display="flex"
+        alignItems="center"
+        justifyContent="center"
+        bg={colorMode === 'light'
+          ? 'linear-gradient(135deg, #f0fdf4 0%, #fef3f2 100%)'
+          : 'linear-gradient(135deg, #1a202c 0%, #2d3748 100%)'
+        }
+      >
         <VStack gap={3}>
           <Text fontSize="4xl">⚠️</Text>
           <Text color="red.500" fontSize="lg" fontWeight="medium">Error loading applications</Text>
-          <Text color="gray.600" fontSize="sm">Please try refreshing the page</Text>
+          <Text color={colorMode === 'light' ? 'gray.600' : 'gray.300'} fontSize="sm">Please try refreshing the page</Text>
         </VStack>
       </Box>
     );
@@ -141,33 +162,43 @@ export default function Home() {
   const remoteJobs = stats?.jobTypeCounts.find(j => j.jobType === 'Remote')?.count || 0;
 
   return (
-    <Box minH="100vh" bg="linear-gradient(to-br, #f8fafc 0%, #e0e7ff 50%, #fce7f3 100%)" py={{ base: 4, md: 8 }}>
+    <Box
+      minH="100vh"
+      bg={colorMode === 'light'
+        ? 'linear-gradient(to-br, #f8fafc 0%, #e0e7ff 50%, #fce7f3 100%)'
+        : 'linear-gradient(to-br, #1a202c 0%, #2d3748 50%, #1a202c 100%)'
+      }
+      py={{ base: 4, md: 8 }}
+      overflowX="hidden"
+      w="100%"
+    >
       <Container maxW="7xl" px={{ base: 4, md: 6 }}>
         <VStack gap={{ base: 5, md: 6 }} align="stretch">
           {/* Header */}
           <Box
-            bg="white"
+            bg={colorMode === 'light' ? 'white' : 'gray.800'}
             p={{ base: 6, md: 8 }}
             borderRadius="2xl"
             shadow="lg"
             borderWidth="1px"
-            borderColor="indigo.100"
+            borderColor={colorMode === 'light' ? 'indigo.100' : 'gray.600'}
           >
             <HStack justify="space-between" align="start" flexWrap="wrap" gap={4}>
               <Box flex="1">
                 <Heading
                   size={{ base: "xl", md: "3xl" }}
                   fontWeight="bold"
-                  color="gray.900"
+                  color={colorMode === 'light' ? 'gray.900' : 'white'}
                   mb={2}
                 >
                   ApplySimple
                 </Heading>
-                <Text color="gray.600" fontSize={{ base: "sm", md: "md" }} maxW="2xl">
+                <Text color={colorMode === 'light' ? 'gray.600' : 'gray.300'} fontSize={{ base: "sm", md: "md" }} maxW="2xl">
                   Your intelligent job application tracking platform
                 </Text>
               </Box>
               <HStack gap={{ base: 2, md: 3 }} flexWrap="wrap">
+                <ColorModeToggle />
                 <Badge
                   px={{ base: 4, md: 5 }}
                   py={{ base: 2, md: 3 }}
@@ -226,7 +257,7 @@ export default function Home() {
           <SimpleGrid columns={{ base: 1, sm: 2, lg: 4 }} gap={{ base: 4, md: 5 }}>
             <Box
               p={{ base: 5, md: 6 }}
-              bg="white"
+              bg={colorMode === 'light' ? 'white' : 'gray.800'}
               borderRadius="2xl"
               borderWidth="2px"
               borderColor="green.200"
@@ -238,20 +269,20 @@ export default function Home() {
                 borderColor: 'green.400',
               }}
             >
-              <Text fontSize={{ base: "xs", md: "sm" }} color="gray.600" mb={2} fontWeight="semibold" textTransform="uppercase" letterSpacing="wide">
+              <Text fontSize={{ base: "xs", md: "sm" }} color={colorMode === 'light' ? 'gray.600' : 'gray.400'} mb={2} fontWeight="semibold" textTransform="uppercase" letterSpacing="wide">
                 Top Source
               </Text>
               <Text fontSize={{ base: "2xl", md: "3xl" }} fontWeight="bold" color="green.700">
                 {topSource?.source || 'N/A'}
               </Text>
-              <Text fontSize={{ base: "xs", md: "sm" }} color="gray.800" mt={1} fontWeight="medium">
+              <Text fontSize={{ base: "xs", md: "sm" }} color={colorMode === 'light' ? 'gray.800' : 'gray.300'} mt={1} fontWeight="medium">
                 {topSource?.count || 0} applications
               </Text>
             </Box>
 
             <Box
               p={{ base: 5, md: 6 }}
-              bg="white"
+              bg={colorMode === 'light' ? 'white' : 'gray.800'}
               borderRadius="2xl"
               borderWidth="2px"
               borderColor="orange.200"
@@ -263,20 +294,20 @@ export default function Home() {
                 borderColor: 'orange.400',
               }}
             >
-              <Text fontSize={{ base: "xs", md: "sm" }} color="gray.600" mb={2} fontWeight="semibold" textTransform="uppercase" letterSpacing="wide">
+              <Text fontSize={{ base: "xs", md: "sm" }} color={colorMode === 'light' ? 'gray.600' : 'gray.400'} mb={2} fontWeight="semibold" textTransform="uppercase" letterSpacing="wide">
                 Remote Jobs
               </Text>
               <Text fontSize={{ base: "2xl", md: "3xl" }} fontWeight="bold" color="orange.600">
                 {remoteJobs}
               </Text>
-              <Text fontSize={{ base: "xs", md: "sm" }} color="gray.800" mt={1} fontWeight="medium">
+              <Text fontSize={{ base: "xs", md: "sm" }} color={colorMode === 'light' ? 'gray.800' : 'gray.300'} mt={1} fontWeight="medium">
                 {stats?.totalApplications ? ((remoteJobs / stats.totalApplications) * 100).toFixed(0) : 0}% of total
               </Text>
             </Box>
 
             <Box
               p={{ base: 5, md: 6 }}
-              bg="white"
+              bg={colorMode === 'light' ? 'white' : 'gray.800'}
               borderRadius="2xl"
               borderWidth="2px"
               borderColor="pink.200"
@@ -288,20 +319,20 @@ export default function Home() {
                 borderColor: 'pink.400',
               }}
             >
-              <Text fontSize={{ base: "xs", md: "sm" }} color="gray.600" mb={2} fontWeight="semibold" textTransform="uppercase" letterSpacing="wide">
+              <Text fontSize={{ base: "xs", md: "sm" }} color={colorMode === 'light' ? 'gray.600' : 'gray.400'} mb={2} fontWeight="semibold" textTransform="uppercase" letterSpacing="wide">
                 Cover Letters
               </Text>
               <Text fontSize={{ base: "2xl", md: "3xl" }} fontWeight="bold" color="pink.600">
                 {stats?.withCoverLetters || 0}
               </Text>
-              <Text fontSize={{ base: "xs", md: "sm" }} color="gray.800" mt={1} fontWeight="medium">
+              <Text fontSize={{ base: "xs", md: "sm" }} color={colorMode === 'light' ? 'gray.800' : 'gray.300'} mt={1} fontWeight="medium">
                 {stats?.totalApplications ? ((stats.withCoverLetters / stats.totalApplications) * 100).toFixed(0) : 0}% of apps
               </Text>
             </Box>
 
             <Box
               p={{ base: 5, md: 6 }}
-              bg="white"
+              bg={colorMode === 'light' ? 'white' : 'gray.800'}
               borderRadius="2xl"
               borderWidth="2px"
               borderColor="#c7d2fe"
@@ -313,13 +344,13 @@ export default function Home() {
                 borderColor: '#818cf8',
               }}
             >
-              <Text fontSize={{ base: "xs", md: "sm" }} color="gray.600" mb={2} fontWeight="semibold" textTransform="uppercase" letterSpacing="wide">
+              <Text fontSize={{ base: "xs", md: "sm" }} color={colorMode === 'light' ? 'gray.600' : 'gray.400'} mb={2} fontWeight="semibold" textTransform="uppercase" letterSpacing="wide">
                 Active Pipeline
               </Text>
               <Text fontSize={{ base: "2xl", md: "3xl" }} fontWeight="bold" color="indigo.600">
                 {activeApplications + interviews}
               </Text>
-              <Text fontSize={{ base: "xs", md: "sm" }} color="gray.800" mt={1} fontWeight="medium">
+              <Text fontSize={{ base: "xs", md: "sm" }} color={colorMode === 'light' ? 'gray.800' : 'gray.300'} mt={1} fontWeight="medium">
                 {activeApplications} applied, {interviews} interviewing
               </Text>
             </Box>
@@ -329,19 +360,19 @@ export default function Home() {
           {applications && applications.length > 0 && (
             <Box
               p={{ base: 5, md: 7 }}
-              bg="white"
+              bg={colorMode === 'light' ? 'white' : 'gray.800'}
               borderRadius="2xl"
               borderWidth="1px"
-              borderColor="indigo.100"
+              borderColor={colorMode === 'light' ? 'indigo.100' : 'gray.600'}
               shadow="lg"
             >
               <VStack align="stretch" gap={{ base: 5, md: 6 }}>
                 <HStack justify="space-between" align="center" flexWrap="wrap" gap={4}>
                   <VStack align="start" gap={1}>
-                    <Heading size={{ base: "lg", md: "xl" }} color="gray.900" fontWeight="bold">
+                    <Heading size={{ base: "lg", md: "xl" }} color={colorMode === 'light' ? 'gray.900' : 'white'} fontWeight="bold">
                       Application Status Overview
                     </Heading>
-                    <Text fontSize={{ base: "sm", md: "md" }} color="gray.600">
+                    <Text fontSize={{ base: "sm", md: "md" }} color={colorMode === 'light' ? 'gray.600' : 'gray.400'}>
                       Visual breakdown of your application pipeline
                     </Text>
                   </VStack>
@@ -370,18 +401,18 @@ export default function Home() {
             <Box
               mb={6}
               p={{ base: 5, md: 6 }}
-              bg="white"
+              bg={colorMode === 'light' ? 'white' : 'gray.800'}
               borderRadius="2xl"
               borderWidth="1px"
-              borderColor="indigo.100"
+              borderColor={colorMode === 'light' ? 'indigo.100' : 'gray.600'}
               shadow="lg"
             >
               <HStack justify="space-between" flexWrap="wrap" gap={4}>
                 <Box>
-                  <Heading size={{ base: "lg", md: "xl" }} color="gray.900" fontWeight="bold" mb={1}>
+                  <Heading size={{ base: "lg", md: "xl" }} color={colorMode === 'light' ? 'gray.900' : 'white'} fontWeight="bold" mb={1}>
                     All Applications
                   </Heading>
-                  <Text fontSize={{ base: "sm", md: "md" }} color="gray.600">
+                  <Text fontSize={{ base: "sm", md: "md" }} color={colorMode === 'light' ? 'gray.600' : 'gray.400'}>
                     View and manage your job applications
                   </Text>
                 </Box>

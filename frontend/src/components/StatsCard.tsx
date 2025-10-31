@@ -1,6 +1,7 @@
 'use client';
 
 import { Box, Text, Stat } from '@chakra-ui/react';
+import { useColorMode } from '@/lib/color-mode';
 
 interface StatsCardProps {
   label: string;
@@ -42,13 +43,14 @@ const colorConfig = {
 };
 
 export function StatsCard({ label, value, icon, color = 'mint', subtitle }: StatsCardProps) {
+  const { colorMode } = useColorMode();
   const config = colorConfig[color as keyof typeof colorConfig] || colorConfig.mint;
 
   return (
     <Box
       p={{ base: 6, md: 7 }}
       borderRadius="2xl"
-      bg="white"
+      bg={colorMode === 'light' ? 'white' : 'gray.800'}
       borderWidth="2px"
       borderColor={config.border}
       shadow="lg"
@@ -86,7 +88,7 @@ export function StatsCard({ label, value, icon, color = 'mint', subtitle }: Stat
         )}
         <Stat.Label
           fontSize={{ base: "xs", md: "sm" }}
-          color="gray.600"
+          color={colorMode === 'light' ? 'gray.600' : 'gray.400'}
           fontWeight="semibold"
           mb={2}
           textTransform="uppercase"
@@ -97,13 +99,13 @@ export function StatsCard({ label, value, icon, color = 'mint', subtitle }: Stat
         <Stat.ValueText
           fontSize={{ base: "3xl", md: "4xl" }}
           fontWeight="bold"
-          color="gray.900"
+          color={colorMode === 'light' ? 'gray.900' : 'white'}
           mb={2}
         >
           {value}
         </Stat.ValueText>
         {subtitle && (
-          <Text fontSize={{ base: "xs", md: "sm" }} color="gray.700" fontWeight="medium">
+          <Text fontSize={{ base: "xs", md: "sm" }} color={colorMode === 'light' ? 'gray.700' : 'gray.300'} fontWeight="medium">
             {subtitle}
           </Text>
         )}
