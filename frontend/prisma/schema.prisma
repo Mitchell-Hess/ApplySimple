@@ -10,10 +10,28 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model User {
+  id            String   @id @default(cuid())
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  email         String   @unique
+  name          String?
+  password      String   // Hashed password
+
+  applications  Application[]
+
+  @@map("users")
+}
+
 model Application {
   id                String   @id @default(cuid())
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
+
+  // User relationship
+  userId            String?
+  user              User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   // Job Information (matches your spreadsheet)
   company           String                    // Column: Company
@@ -41,6 +59,7 @@ model Application {
   // Computed Status (derived from your data)
   status            String    @default("Applied")  // Applied, Interview, Offer, Rejected
 
+  @@index([userId])
   @@index([status])
   @@index([dateApplied])
   @@index([company])

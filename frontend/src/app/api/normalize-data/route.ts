@@ -1,16 +1,29 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { normalizeJobType, normalizeStatus, normalizeSource, normalizeCompany } from '@/lib/normalize';
+import { auth } from '@/lib/auth';
 
 /**
  * POST /api/normalize-data
- * Normalizes all existing data in the database
+ * Normalizes all existing data in the database for the authenticated user
  * This endpoint should be called to clean up existing data after updating normalization rules
  */
 export async function POST() {
   try {
-    // Fetch all applications
-    const applications = await prisma.application.findMany();
+    const session = await auth();
+    if (!session?.user) {
+      return NextResponse.json(
+        { error: 'Unauthorized' },
+        { status: 401 }
+      );
+    }
+
+    // Fetch all applications for the user
+    const applications = await prisma.application.findMany({
+      where: {
+        userId: session.user.id,
+      },
+    });
 
     let updatedCount = 0;
 

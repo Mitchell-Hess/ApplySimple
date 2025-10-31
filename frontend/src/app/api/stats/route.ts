@@ -1,20 +1,35 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { auth } from '@/lib/auth';
 
 export async function GET() {
   try {
+    const session = await auth();
+    if (!session?.user) {
+      return NextResponse.json(
+        { error: 'Unauthorized' },
+        { status: 401 }
+      );
+    }
+
+    const userFilter = { userId: session.user.id };
+
     // Get total count
-    const totalApplications = await prisma.application.count();
+    const totalApplications = await prisma.application.count({
+      where: userFilter,
+    });
 
     // Get status counts
     const statusCounts = await prisma.application.groupBy({
       by: ['status'],
+      where: userFilter,
       _count: true,
     });
 
     // Get source counts
     const sourceCounts = await prisma.application.groupBy({
       by: ['foundOn'],
+      where: userFilter,
       _count: true,
       orderBy: {
         _count: {
@@ -28,6 +43,7 @@ export async function GET() {
       by: ['jobType'],
       _count: true,
       where: {
+        ...userFilter,
         jobType: {
           not: null,
         },
@@ -37,6 +53,7 @@ export async function GET() {
     // Get applications with outcomes
     const withOutcomes = await prisma.application.count({
       where: {
+        ...userFilter,
         dateOfOutcome: {
           not: null,
         },
@@ -46,6 +63,7 @@ export async function GET() {
     // Get applications with cover letters
     const withCoverLetters = await prisma.application.count({
       where: {
+        ...userFilter,
         coverLetterUsed: true,
       },
     });
@@ -53,6 +71,7 @@ export async function GET() {
     // Get interview stats
     const withInterviews = await prisma.application.count({
       where: {
+        ...userFilter,
         numberOfRounds: {
           gt: 0,
         },
@@ -65,6 +84,7 @@ export async function GET() {
 
     const recentApplications = await prisma.application.count({
       where: {
+        ...userFilter,
         dateApplied: {
           gte: thirtyDaysAgo,
         },
@@ -74,6 +94,7 @@ export async function GET() {
     // Calculate average response time (days between application and outcome)
     const applicationsWithOutcomes = await prisma.application.findMany({
       where: {
+        ...userFilter,
         dateOfOutcome: {
           not: null,
         },

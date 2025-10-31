@@ -1,15 +1,27 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { normalizeJobType, normalizeStatus, normalizeSource, normalizeCompany } from '@/lib/normalize';
+import { auth } from '@/lib/auth';
 
 export async function GET(request: NextRequest) {
   try {
+    const session = await auth();
+    if (!session?.user) {
+      return NextResponse.json(
+        { error: 'Unauthorized' },
+        { status: 401 }
+      );
+    }
+
     const searchParams = request.nextUrl.searchParams;
     const limit = searchParams.get('limit');
     const offset = searchParams.get('offset');
 
-    // Fetch applications from database, ordered by most recent first
+    // Fetch applications from database, filtered by user and ordered by most recent first
     const applications = await prisma.application.findMany({
+      where: {
+        userId: session.user.id,
+      },
       orderBy: { dateApplied: 'desc' },
       take: limit ? parseInt(limit) : undefined,
       skip: offset ? parseInt(offset) : undefined,
@@ -27,10 +39,19 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
+    const session = await auth();
+    if (!session?.user) {
+      return NextResponse.json(
+        { error: 'Unauthorized' },
+        { status: 401 }
+      );
+    }
+
     const body = await request.json();
 
     // Normalize data before saving
     const normalizedData = {
+      userId: session.user.id,
       company: normalizeCompany(body.company),
       jobTitle: body.jobTitle?.trim(),
       salary: body.salary?.trim(),
@@ -62,6 +83,14 @@ export async function POST(request: NextRequest) {
 
 export async function PUT(request: NextRequest) {
   try {
+    const session = await auth();
+    if (!session?.user) {
+      return NextResponse.json(
+        { error: 'Unauthorized' },
+        { status: 401 }
+      );
+    }
+
     const body = await request.json();
     const { id, ...updateData } = body;
 
@@ -69,6 +98,19 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json(
         { error: 'Application ID is required' },
         { status: 400 }
+      );
+    }
+
+    // Verify that the application belongs to the user
+    const existingApp = await prisma.application.findUnique({
+      where: { id },
+      select: { userId: true },
+    });
+
+    if (!existingApp || existingApp.userId !== session.user.id) {
+      return NextResponse.json(
+        { error: 'Application not found or unauthorized' },
+        { status: 404 }
       );
     }
 
@@ -106,6 +148,14 @@ export async function PUT(request: NextRequest) {
 
 export async function DELETE(request: NextRequest) {
   try {
+    const session = await auth();
+    if (!session?.user) {
+      return NextResponse.json(
+        { error: 'Unauthorized' },
+        { status: 401 }
+      );
+    }
+
     const searchParams = request.nextUrl.searchParams;
     const id = searchParams.get('id');
 
@@ -113,6 +163,19 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json(
         { error: 'Application ID is required' },
         { status: 400 }
+      );
+    }
+
+    // Verify that the application belongs to the user
+    const existingApp = await prisma.application.findUnique({
+      where: { id },
+      select: { userId: true },
+    });
+
+    if (!existingApp || existingApp.userId !== session.user.id) {
+      return NextResponse.json(
+        { error: 'Application not found or unauthorized' },
+        { status: 404 }
       );
     }
 
