@@ -1,6 +1,6 @@
 'use client';
 
-import { Box, HStack, VStack, Input, Button, Text } from '@chakra-ui/react';
+import { Box, HStack, VStack, Input, Button, Text, SimpleGrid } from '@chakra-ui/react';
 import { useState } from 'react';
 
 export interface FilterState {
@@ -43,36 +43,42 @@ export function FilterBar({ filters, onFilterChange, availableSources, available
 
   return (
     <Box
-      p={6}
+      p={{ base: 5, md: 6 }}
       bg="white"
-      borderRadius="xl"
+      borderRadius="2xl"
       borderWidth="1px"
-      borderColor="gray.200"
-      shadow="sm"
+      borderColor="indigo.100"
+      shadow="lg"
       mb={6}
     >
-      <VStack align="stretch" gap={4}>
+      <VStack align="stretch" gap={5}>
         {/* Search Bar */}
         <Box>
-          <Text fontSize="sm" fontWeight="semibold" color="gray.700" mb={2}>
-            Search
+          <Text fontSize={{ base: "xs", md: "sm" }} fontWeight="semibold" color="gray.700" mb={3}>
+            Search Applications
           </Text>
           <Input
             placeholder="Search by company, position, or notes..."
             value={filters.search}
             onChange={(e) => handleInputChange('search', e.target.value)}
-            size="lg"
+            size={{ base: "md", md: "lg" }}
             bg="gray.50"
             borderColor="gray.300"
-            _focus={{ borderColor: 'blue.400', bg: 'white' }}
+            borderRadius="lg"
+            _hover={{ borderColor: 'indigo.300' }}
+            _focus={{
+              borderColor: 'indigo.500',
+              bg: 'white',
+              shadow: '0 0 0 3px rgba(99, 102, 241, 0.1)',
+            }}
           />
         </Box>
 
         {/* Filter Controls */}
-        <HStack gap={4} flexWrap="wrap" align="end">
+        <SimpleGrid columns={{ base: 1, sm: 2, lg: 5 }} gap={4}>
           {/* Status Filter */}
-          <Box flex="1" minW="150px">
-            <Text fontSize="sm" fontWeight="semibold" color="gray.700" mb={2}>
+          <Box>
+            <Text fontSize={{ base: "xs", md: "sm" }} fontWeight="semibold" color="gray.700" mb={2}>
               Status
             </Text>
             <Box
@@ -82,11 +88,12 @@ export function FilterBar({ filters, onFilterChange, availableSources, available
               px={4}
               py={2}
               fontSize="md"
-              borderRadius="md"
+              borderRadius="lg"
               bg="gray.50"
               borderWidth="1px"
               borderColor="gray.300"
-              _focus={{ borderColor: 'blue.400', bg: 'white', outline: 'none' }}
+              _hover={{ borderColor: 'indigo.300' }}
+              _focus={{ borderColor: 'indigo.500', bg: 'white', outline: 'none', shadow: '0 0 0 3px rgba(99, 102, 241, 0.1)' }}
               cursor="pointer"
               width="100%"
               height="44px"
@@ -101,8 +108,8 @@ export function FilterBar({ filters, onFilterChange, availableSources, available
           </Box>
 
           {/* Source Filter */}
-          <Box flex="1" minW="150px">
-            <Text fontSize="sm" fontWeight="semibold" color="gray.700" mb={2}>
+          <Box>
+            <Text fontSize={{ base: "xs", md: "sm" }} fontWeight="semibold" color="gray.700" mb={2}>
               Source
             </Text>
             <Box
@@ -112,11 +119,11 @@ export function FilterBar({ filters, onFilterChange, availableSources, available
               px={4}
               py={2}
               fontSize="md"
-              borderRadius="md"
+              borderRadius="lg"
               bg="gray.50"
               borderWidth="1px"
               borderColor="gray.300"
-              _focus={{ borderColor: 'blue.400', bg: 'white', outline: 'none' }}
+              _focus={{ borderColor: 'blue.400', bg: 'white', outline: 'none', shadow: '0 0 0 3px rgba(59, 130, 246, 0.1)' }}
               cursor="pointer"
               width="100%"
               height="44px"
@@ -131,8 +138,8 @@ export function FilterBar({ filters, onFilterChange, availableSources, available
           </Box>
 
           {/* Job Type Filter */}
-          <Box flex="1" minW="150px">
-            <Text fontSize="sm" fontWeight="semibold" color="gray.700" mb={2}>
+          <Box>
+            <Text fontSize={{ base: "xs", md: "sm" }} fontWeight="semibold" color="gray.700" mb={2}>
               Job Type
             </Text>
             <Box
@@ -142,11 +149,11 @@ export function FilterBar({ filters, onFilterChange, availableSources, available
               px={4}
               py={2}
               fontSize="md"
-              borderRadius="md"
+              borderRadius="lg"
               bg="gray.50"
               borderWidth="1px"
               borderColor="gray.300"
-              _focus={{ borderColor: 'blue.400', bg: 'white', outline: 'none' }}
+              _focus={{ borderColor: 'blue.400', bg: 'white', outline: 'none', shadow: '0 0 0 3px rgba(59, 130, 246, 0.1)' }}
               cursor="pointer"
               width="100%"
               height="44px"
@@ -161,37 +168,41 @@ export function FilterBar({ filters, onFilterChange, availableSources, available
           </Box>
 
           {/* Date From */}
-          <Box flex="1" minW="150px">
-            <Text fontSize="sm" fontWeight="semibold" color="gray.700" mb={2}>
+          <Box>
+            <Text fontSize={{ base: "xs", md: "sm" }} fontWeight="semibold" color="gray.700" mb={2}>
               From Date
             </Text>
             <Input
               type="date"
               value={filters.dateFrom}
               onChange={(e) => handleInputChange('dateFrom', e.target.value)}
-              size="lg"
+              size={{ base: "md", md: "lg" }}
               bg="gray.50"
               borderColor="gray.300"
-              _focus={{ borderColor: 'blue.400', bg: 'white' }}
+              borderRadius="lg"
+              _hover={{ borderColor: 'indigo.300' }}
+              _focus={{ borderColor: 'indigo.500', bg: 'white', shadow: '0 0 0 3px rgba(99, 102, 241, 0.1)' }}
             />
           </Box>
 
           {/* Date To */}
-          <Box flex="1" minW="150px">
-            <Text fontSize="sm" fontWeight="semibold" color="gray.700" mb={2}>
+          <Box>
+            <Text fontSize={{ base: "xs", md: "sm" }} fontWeight="semibold" color="gray.700" mb={2}>
               To Date
             </Text>
             <Input
               type="date"
               value={filters.dateTo}
               onChange={(e) => handleInputChange('dateTo', e.target.value)}
-              size="lg"
+              size={{ base: "md", md: "lg" }}
               bg="gray.50"
               borderColor="gray.300"
-              _focus={{ borderColor: 'blue.400', bg: 'white' }}
+              borderRadius="lg"
+              _hover={{ borderColor: 'indigo.300' }}
+              _focus={{ borderColor: 'indigo.500', bg: 'white', shadow: '0 0 0 3px rgba(99, 102, 241, 0.1)' }}
             />
           </Box>
-        </HStack>
+        </SimpleGrid>
 
         {/* Reset Button */}
         {hasActiveFilters && (

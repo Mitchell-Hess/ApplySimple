@@ -46,7 +46,7 @@ export default function Home() {
 
   const availableJobTypes = useMemo(() => {
     if (!applications) return [];
-    const jobTypes = new Set(applications.map(app => app.jobType).filter(Boolean));
+    const jobTypes = new Set(applications.map(app => app.jobType).filter((jt): jt is string => Boolean(jt)));
     return Array.from(jobTypes).sort();
   }, [applications]);
 
@@ -104,7 +104,7 @@ export default function Home() {
     return (
       <Box minH="100vh" display="flex" alignItems="center" justifyContent="center" bg="linear-gradient(135deg, #f0fdf4 0%, #fef3f2 100%)">
         <VStack gap={4}>
-          <Spinner size="xl" color="blue.500" thickness="4px" />
+          <Spinner size="xl" color="blue.500" />
           <Text color="gray.600">Loading your applications...</Text>
         </VStack>
       </Box>
@@ -141,53 +141,61 @@ export default function Home() {
   const remoteJobs = stats?.jobTypeCounts.find(j => j.jobType === 'Remote')?.count || 0;
 
   return (
-    <Box minH="100vh" bg="linear-gradient(135deg, #f0fdf4 0%, #fef3f2 100%)" py={8}>
-      <Container maxW="7xl">
-        <VStack gap={8} align="stretch">
+    <Box minH="100vh" bg="linear-gradient(to-br, #f8fafc 0%, #e0e7ff 50%, #fce7f3 100%)" py={{ base: 4, md: 8 }}>
+      <Container maxW="7xl" px={{ base: 4, md: 6 }}>
+        <VStack gap={{ base: 5, md: 6 }} align="stretch">
           {/* Header */}
-          <Box py={6}>
-            <VStack align="start" gap={4} mb={6}>
-              <Heading
-                size="3xl"
-                fontWeight="bold"
-                color="gray.900"
-                letterSpacing="tight"
-              >
-                ApplySimple
-              </Heading>
-              <Text color="gray.600" fontSize="lg" maxW="3xl" lineHeight="tall">
-                A comprehensive job application tracking system that helps you organize, monitor, and analyze your job search.
-                Track applications, visualize your pipeline, and gain insights into your application success rates across different platforms and job types.
-              </Text>
-            </VStack>
-            <HStack gap={4} flexWrap="wrap">
-              <Badge
-                size="lg"
-                px={4}
-                py={2}
-                borderRadius="md"
-                bg="green.100"
-                color="green.800"
-                fontWeight="semibold"
-              >
-                {stats?.totalApplications || 0} Total Applications
-              </Badge>
-              <Badge
-                size="lg"
-                px={4}
-                py={2}
-                borderRadius="md"
-                bg="blue.100"
-                color="blue.800"
-                fontWeight="semibold"
-              >
-                {stats?.recentApplications || 0} Recent (30 days)
-              </Badge>
+          <Box
+            bg="white"
+            p={{ base: 6, md: 8 }}
+            borderRadius="2xl"
+            shadow="lg"
+            borderWidth="1px"
+            borderColor="indigo.100"
+          >
+            <HStack justify="space-between" align="start" flexWrap="wrap" gap={4}>
+              <Box flex="1">
+                <Heading
+                  size={{ base: "xl", md: "3xl" }}
+                  fontWeight="bold"
+                  color="gray.900"
+                  mb={2}
+                >
+                  ApplySimple
+                </Heading>
+                <Text color="gray.600" fontSize={{ base: "sm", md: "md" }} maxW="2xl">
+                  Your intelligent job application tracking platform
+                </Text>
+              </Box>
+              <HStack gap={{ base: 2, md: 3 }} flexWrap="wrap">
+                <Badge
+                  px={{ base: 4, md: 5 }}
+                  py={{ base: 2, md: 3 }}
+                  borderRadius="xl"
+                  bg="blue.600"
+                  color="white"
+                  fontWeight="semibold"
+                  fontSize={{ base: "xs", md: "sm" }}
+                >
+                  {stats?.totalApplications || 0} Applications
+                </Badge>
+                <Badge
+                  px={{ base: 4, md: 5 }}
+                  py={{ base: 2, md: 3 }}
+                  borderRadius="xl"
+                  bg="purple.600"
+                  color="white"
+                  fontWeight="semibold"
+                  fontSize={{ base: "xs", md: "sm" }}
+                >
+                  {stats?.withInterviews || 0} Interviews
+                </Badge>
+              </HStack>
             </HStack>
           </Box>
 
           {/* Primary Stats Grid */}
-          <SimpleGrid columns={{ base: 1, sm: 2, lg: 4 }} gap={6}>
+          <SimpleGrid columns={{ base: 1, sm: 2, lg: 4 }} gap={{ base: 4, md: 6 }}>
             <StatsCard
               label="Total Applications"
               value={stats?.totalApplications || 0}
@@ -215,87 +223,103 @@ export default function Home() {
           </SimpleGrid>
 
           {/* Secondary Stats Grid */}
-          <SimpleGrid columns={{ base: 1, sm: 2, lg: 4 }} gap={6}>
+          <SimpleGrid columns={{ base: 1, sm: 2, lg: 4 }} gap={{ base: 4, md: 5 }}>
             <Box
-              p={6}
-              bg="green.50"
-              borderRadius="xl"
-              borderWidth="1px"
+              p={{ base: 5, md: 6 }}
+              bg="white"
+              borderRadius="2xl"
+              borderWidth="2px"
               borderColor="green.200"
-              shadow="sm"
-              transition="all 0.2s"
-              _hover={{ shadow: 'md', transform: 'translateY(-2px)' }}
+              shadow="md"
+              transition="all 0.3s ease"
+              _hover={{
+                transform: 'translateY(-2px)',
+                shadow: 'lg',
+                borderColor: 'green.400',
+              }}
             >
-              <Text fontSize="xs" color="green.700" mb={2} fontWeight="semibold">
+              <Text fontSize={{ base: "xs", md: "sm" }} color="gray.600" mb={2} fontWeight="semibold" textTransform="uppercase" letterSpacing="wide">
                 Top Source
               </Text>
-              <Text fontSize="2xl" fontWeight="bold" color="gray.900">
+              <Text fontSize={{ base: "2xl", md: "3xl" }} fontWeight="bold" color="green.700">
                 {topSource?.source || 'N/A'}
               </Text>
-              <Text fontSize="sm" color="gray.600" mt={1}>
+              <Text fontSize={{ base: "xs", md: "sm" }} color="gray.800" mt={1} fontWeight="medium">
                 {topSource?.count || 0} applications
               </Text>
             </Box>
 
             <Box
-              p={6}
-              bg="orange.50"
-              borderRadius="xl"
-              borderWidth="1px"
+              p={{ base: 5, md: 6 }}
+              bg="white"
+              borderRadius="2xl"
+              borderWidth="2px"
               borderColor="orange.200"
-              shadow="sm"
-              transition="all 0.2s"
-              _hover={{ shadow: 'md', transform: 'translateY(-2px)' }}
+              shadow="md"
+              transition="all 0.3s ease"
+              _hover={{
+                transform: 'translateY(-2px)',
+                shadow: 'lg',
+                borderColor: 'orange.400',
+              }}
             >
-              <Text fontSize="xs" color="orange.700" mb={2} fontWeight="semibold">
+              <Text fontSize={{ base: "xs", md: "sm" }} color="gray.600" mb={2} fontWeight="semibold" textTransform="uppercase" letterSpacing="wide">
                 Remote Jobs
               </Text>
-              <Text fontSize="2xl" fontWeight="bold" color="gray.900">
+              <Text fontSize={{ base: "2xl", md: "3xl" }} fontWeight="bold" color="orange.600">
                 {remoteJobs}
               </Text>
-              <Text fontSize="sm" color="gray.600" mt={1}>
+              <Text fontSize={{ base: "xs", md: "sm" }} color="gray.800" mt={1} fontWeight="medium">
                 {stats?.totalApplications ? ((remoteJobs / stats.totalApplications) * 100).toFixed(0) : 0}% of total
               </Text>
             </Box>
 
             <Box
-              p={6}
-              bg="purple.50"
-              borderRadius="xl"
-              borderWidth="1px"
-              borderColor="purple.200"
-              shadow="sm"
-              transition="all 0.2s"
-              _hover={{ shadow: 'md', transform: 'translateY(-2px)' }}
+              p={{ base: 5, md: 6 }}
+              bg="white"
+              borderRadius="2xl"
+              borderWidth="2px"
+              borderColor="pink.200"
+              shadow="md"
+              transition="all 0.3s ease"
+              _hover={{
+                transform: 'translateY(-2px)',
+                shadow: 'lg',
+                borderColor: 'pink.400',
+              }}
             >
-              <Text fontSize="xs" color="purple.700" mb={2} fontWeight="semibold">
+              <Text fontSize={{ base: "xs", md: "sm" }} color="gray.600" mb={2} fontWeight="semibold" textTransform="uppercase" letterSpacing="wide">
                 Cover Letters
               </Text>
-              <Text fontSize="2xl" fontWeight="bold" color="gray.900">
+              <Text fontSize={{ base: "2xl", md: "3xl" }} fontWeight="bold" color="pink.600">
                 {stats?.withCoverLetters || 0}
               </Text>
-              <Text fontSize="sm" color="gray.600" mt={1}>
+              <Text fontSize={{ base: "xs", md: "sm" }} color="gray.800" mt={1} fontWeight="medium">
                 {stats?.totalApplications ? ((stats.withCoverLetters / stats.totalApplications) * 100).toFixed(0) : 0}% of apps
               </Text>
             </Box>
 
             <Box
-              p={6}
-              bg="blue.50"
-              borderRadius="xl"
-              borderWidth="1px"
-              borderColor="blue.200"
-              shadow="sm"
-              transition="all 0.2s"
-              _hover={{ shadow: 'md', transform: 'translateY(-2px)' }}
+              p={{ base: 5, md: 6 }}
+              bg="white"
+              borderRadius="2xl"
+              borderWidth="2px"
+              borderColor="#c7d2fe"
+              shadow="md"
+              transition="all 0.3s ease"
+              _hover={{
+                transform: 'translateY(-2px)',
+                shadow: 'lg',
+                borderColor: '#818cf8',
+              }}
             >
-              <Text fontSize="xs" color="blue.700" mb={2} fontWeight="semibold">
+              <Text fontSize={{ base: "xs", md: "sm" }} color="gray.600" mb={2} fontWeight="semibold" textTransform="uppercase" letterSpacing="wide">
                 Active Pipeline
               </Text>
-              <Text fontSize="2xl" fontWeight="bold" color="gray.900">
+              <Text fontSize={{ base: "2xl", md: "3xl" }} fontWeight="bold" color="indigo.600">
                 {activeApplications + interviews}
               </Text>
-              <Text fontSize="sm" color="gray.600" mt={1}>
+              <Text fontSize={{ base: "xs", md: "sm" }} color="gray.800" mt={1} fontWeight="medium">
                 {activeApplications} applied, {interviews} interviewing
               </Text>
             </Box>
@@ -304,33 +328,31 @@ export default function Home() {
           {/* Chart Section */}
           {applications && applications.length > 0 && (
             <Box
-              p={6}
-              bg="linear-gradient(135deg, #fafafa 0%, #f5f5f5 100%)"
-              borderRadius="xl"
+              p={{ base: 5, md: 7 }}
+              bg="white"
+              borderRadius="2xl"
               borderWidth="1px"
-              borderColor="gray.300"
-              shadow="sm"
+              borderColor="indigo.100"
+              shadow="lg"
             >
-              <VStack align="stretch" gap={4}>
-                <HStack justify="space-between" align="center" flexWrap="wrap" gap={3}>
+              <VStack align="stretch" gap={{ base: 5, md: 6 }}>
+                <HStack justify="space-between" align="center" flexWrap="wrap" gap={4}>
                   <VStack align="start" gap={1}>
-                    <Heading size="lg" color="gray.900" fontWeight="bold">
+                    <Heading size={{ base: "lg", md: "xl" }} color="gray.900" fontWeight="bold">
                       Application Status Overview
                     </Heading>
-                    <Text fontSize="sm" color="gray.600">
+                    <Text fontSize={{ base: "sm", md: "md" }} color="gray.600">
                       Visual breakdown of your application pipeline
                     </Text>
                   </VStack>
                   <Badge
-                    size="md"
-                    px={4}
+                    px={{ base: 4, md: 5 }}
                     py={2}
-                    borderRadius="md"
-                    bg="white"
-                    color="gray.700"
+                    borderRadius="lg"
+                    bg="blue.600"
+                    color="white"
                     fontWeight="semibold"
-                    borderWidth="1px"
-                    borderColor="gray.300"
+                    fontSize={{ base: "sm", md: "md" }}
                   >
                     {applications.length} Total
                   </Badge>
@@ -345,37 +367,50 @@ export default function Home() {
 
           {/* Applications Table */}
           <Box>
-            <HStack justify="space-between" mb={4} flexWrap="wrap" gap={3}>
-              <Heading size="lg" color="gray.900">Applications</Heading>
-              <HStack gap={3}>
-                <Badge
-                  colorPalette="green"
-                  size="lg"
-                  px={4}
-                  py={2}
-                  borderRadius="full"
-                  bg="green.100"
-                  color="green.800"
-                  borderWidth="1px"
-                  borderColor="green.300"
-                >
-                  {filteredApplications.length} filtered
-                </Badge>
-                <Badge
-                  colorPalette="gray"
-                  size="lg"
-                  px={4}
-                  py={2}
-                  borderRadius="full"
-                  bg="gray.100"
-                  color="gray.700"
-                  borderWidth="1px"
-                  borderColor="gray.300"
-                >
-                  {applications?.length || 0} total
-                </Badge>
+            <Box
+              mb={6}
+              p={{ base: 5, md: 6 }}
+              bg="white"
+              borderRadius="2xl"
+              borderWidth="1px"
+              borderColor="indigo.100"
+              shadow="lg"
+            >
+              <HStack justify="space-between" flexWrap="wrap" gap={4}>
+                <Box>
+                  <Heading size={{ base: "lg", md: "xl" }} color="gray.900" fontWeight="bold" mb={1}>
+                    All Applications
+                  </Heading>
+                  <Text fontSize={{ base: "sm", md: "md" }} color="gray.600">
+                    View and manage your job applications
+                  </Text>
+                </Box>
+                <HStack gap={{ base: 2, md: 3 }} flexWrap="wrap">
+                  <Badge
+                    px={{ base: 4, md: 5 }}
+                    py={2}
+                    borderRadius="lg"
+                    bg="green.700"
+                    color="white"
+                    fontWeight="semibold"
+                    fontSize={{ base: "xs", md: "sm" }}
+                  >
+                    {filteredApplications.length} Shown
+                  </Badge>
+                  <Badge
+                    px={{ base: 4, md: 5 }}
+                    py={2}
+                    borderRadius="lg"
+                    bg="blue.600"
+                    color="white"
+                    fontWeight="semibold"
+                    fontSize={{ base: "xs", md: "sm" }}
+                  >
+                    {applications?.length || 0} Total
+                  </Badge>
+                </HStack>
               </HStack>
-            </HStack>
+            </Box>
 
             <FilterBar
               filters={filters}
