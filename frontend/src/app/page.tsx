@@ -11,7 +11,7 @@ import { MLInsights } from '@/components/MLInsights';
 import { FilterBar, FilterState } from '@/components/FilterBar';
 import { ColorModeToggle } from '@/components/ColorModeToggle';
 import { useColorMode } from '@/lib/color-mode';
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
 import { Application, PredictionResponse } from '@/types/application';
 
 export default function Home() {
@@ -36,12 +36,12 @@ export default function Home() {
   });
 
   const [predictions, setPredictions] = useState<Map<string, PredictionResponse>>(new Map());
-  const [loadingPredictions, setLoadingPredictions] = useState(false);
+  const loadingRef = useRef(false);
 
   // Generate ML predictions when applications are loaded
   useEffect(() => {
-    if (applications && applications.length > 0 && predictions.size === 0 && !loadingPredictions) {
-      setLoadingPredictions(true);
+    if (applications && applications.length > 0 && predictions.size === 0 && !loadingRef.current) {
+      loadingRef.current = true;
       generatePredictions(applications)
         .then((newPredictions) => {
           setPredictions(newPredictions);
@@ -50,10 +50,10 @@ export default function Home() {
           console.error('Failed to generate predictions:', error);
         })
         .finally(() => {
-          setLoadingPredictions(false);
+          loadingRef.current = false;
         });
     }
-  }, [applications, predictions.size, loadingPredictions]);
+  }, [applications, predictions.size]);
 
   // Get unique values for filter dropdowns
   const availableSources = useMemo(() => {

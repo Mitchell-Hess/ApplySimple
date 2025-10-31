@@ -15,7 +15,13 @@ export async function POST(request: NextRequest) {
     });
 
     if (!response.ok) {
-      throw new Error(`ML service responded with status: ${response.status}`);
+      // Return the actual status code from the ML service
+      // 422 = validation error (missing required fields)
+      // These will be handled silently on the client side
+      return NextResponse.json(
+        { error: 'Failed to get prediction from ML service' },
+        { status: response.status }
+      );
     }
 
     const data = await response.json();
