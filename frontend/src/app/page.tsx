@@ -8,6 +8,7 @@ import { ApplicationsTable } from '@/components/ApplicationsTable';
 import { StatusChart } from '@/components/StatusChart';
 import { SourceAnalytics } from '@/components/SourceAnalytics';
 import { MLInsights } from '@/components/MLInsights';
+import { SalaryInsights } from '@/components/SalaryInsights';
 import { FilterBar, FilterState } from '@/components/FilterBar';
 import { ColorModeToggle } from '@/components/ColorModeToggle';
 import { ApplicationFormModal } from '@/components/ApplicationFormModal';
@@ -45,6 +46,7 @@ export default function Home() {
   // Modal state for add/edit
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingApplication, setEditingApplication] = useState<Application | null>(null);
+  const [isNormalizing, setIsNormalizing] = useState(false);
 
   // Handlers for CRUD operations
   const handleAdd = () => {
@@ -77,6 +79,35 @@ export default function Home() {
     // Invalidate queries to refetch data
     queryClient.invalidateQueries({ queryKey: ['applications'] });
     queryClient.invalidateQueries({ queryKey: ['stats'] });
+  };
+
+  const handleNormalizeData = async () => {
+    if (!window.confirm('This will normalize all existing data (job types, statuses, sources, etc.). Continue?')) {
+      return;
+    }
+
+    setIsNormalizing(true);
+    try {
+      const response = await fetch('/api/normalize-data', {
+        method: 'POST',
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to normalize data');
+      }
+
+      const result = await response.json();
+      alert(result.message);
+
+      // Refresh data
+      queryClient.invalidateQueries({ queryKey: ['applications'] });
+      queryClient.invalidateQueries({ queryKey: ['stats'] });
+    } catch (error) {
+      console.error('Normalization error:', error);
+      alert('Failed to normalize data. Please try again.');
+    } finally {
+      setIsNormalizing(false);
+    }
   };
 
   // Generate ML predictions when applications are loaded
@@ -261,6 +292,15 @@ export default function Home() {
               </Box>
               <HStack gap={{ base: 2, md: 3 }} flexWrap="wrap">
                 <ColorModeToggle />
+                <Button
+                  onClick={handleNormalizeData}
+                  size="sm"
+                  variant="outline"
+                  colorPalette="blue"
+                  disabled={isNormalizing}
+                >
+                  {isNormalizing ? 'Normalizing...' : 'Normalize Data'}
+                </Button>
                 <Badge
                   px={{ base: 4, md: 5 }}
                   py={{ base: 2, md: 3 }}
@@ -457,6 +497,9 @@ export default function Home() {
 
           {/* Analytics Section */}
           {stats && <SourceAnalytics stats={stats} />}
+
+          {/* Salary Insights Section */}
+          {applications && <SalaryInsights applications={applications} />}
 
           {/* ML Insights Section */}
           {applications && <MLInsights applications={applications} predictions={predictions} />}
