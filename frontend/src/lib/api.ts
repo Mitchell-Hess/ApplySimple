@@ -45,3 +45,42 @@ export async function predictSuccess(data: PredictionRequest): Promise<Predictio
   }
   return response.json();
 }
+
+// Helper function to convert Application to PredictionRequest
+export function applicationToPredictionRequest(app: Application): PredictionRequest {
+  return {
+    company: app.company,
+    position: app.jobTitle,
+    workType: app.jobType as 'Remote' | 'Hybrid' | 'On-site' | undefined,
+    source: app.foundOn,
+    status: app.status as 'Applied' | 'Screening' | 'Interview' | 'Offer' | 'Rejected' | 'Withdrawn',
+    dateApplied: app.dateApplied,
+    coverLetterUsed: app.coverLetterUsed,
+  };
+}
+
+// Generate predictions for multiple applications
+export async function generatePredictions(applications: Application[]): Promise<Map<string, PredictionResponse>> {
+  const predictions = new Map<string, PredictionResponse>();
+
+  // Process in batches to avoid overwhelming the API
+  const batchSize = 5;
+  for (let i = 0; i < applications.length; i += batchSize) {
+    const batch = applications.slice(i, i + batchSize);
+
+    await Promise.all(
+      batch.map(async (app) => {
+        try {
+          const predictionRequest = applicationToPredictionRequest(app);
+          const prediction = await predictSuccess(predictionRequest);
+          predictions.set(app.id, prediction);
+        } catch (error) {
+          console.error(`Failed to get prediction for application ${app.id}:`, error);
+          // Continue with other predictions even if one fails
+        }
+      })
+    );
+  }
+
+  return predictions;
+}
