@@ -100,8 +100,8 @@ export function ApplicationsTable({ applications }: ApplicationsTableProps) {
 
   if (applications.length === 0) {
     return (
-      <Box p={8} textAlign="center" color="gray.500" bg="white" borderRadius="xl" borderWidth="1px" borderColor="gray.200">
-        No applications yet. Start adding your job applications!
+      <Box p={{ base: 6, md: 8 }} textAlign="center" color="gray.500" bg="white" borderRadius="xl" borderWidth="1px" borderColor="gray.200">
+        <Text fontSize={{ base: "sm", md: "md" }}>No applications yet. Start adding your job applications!</Text>
       </Box>
     );
   }
@@ -295,11 +295,11 @@ export function ApplicationsTable({ applications }: ApplicationsTableProps) {
     </Box>
 
     {!showAll && applications.length > 10 && (
-      <Box mt={4} textAlign="center">
+      <Box mt={{ base: 3, md: 4 }} textAlign="center">
         <Button
           onClick={() => setShowAll(true)}
           colorPalette="green"
-          size="lg"
+          size={{ base: "md", md: "lg" }}
           variant="outline"
         >
           Show All {applications.length} Applications
@@ -308,11 +308,11 @@ export function ApplicationsTable({ applications }: ApplicationsTableProps) {
     )}
 
     {showAll && applications.length > 10 && (
-      <Box mt={4} textAlign="center">
+      <Box mt={{ base: 3, md: 4 }} textAlign="center">
         <Button
           onClick={() => setShowAll(false)}
           colorPalette="gray"
-          size="lg"
+          size={{ base: "md", md: "lg" }}
           variant="outline"
         >
           Show Less

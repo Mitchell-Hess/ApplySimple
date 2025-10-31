@@ -12,28 +12,32 @@ interface StatsCardProps {
 
 const colorConfig = {
   mint: {
-    bg: 'green.50',
-    border: 'green.200',
-    text: 'green.700',
-    value: 'gray.900',
+    bg: '#ecfdf5',        // emerald.50
+    border: '#a7f3d0',    // emerald.200
+    accent: '#10b981',    // emerald.500
+    iconBg: '#d1fae5',    // emerald.100
+    iconColor: '#059669',  // emerald.600
   },
   peach: {
     bg: 'orange.50',
     border: 'orange.200',
-    text: 'orange.700',
-    value: 'gray.900',
+    accent: 'orange.500',
+    iconBg: 'orange.100',
+    iconColor: 'orange.600',
   },
   lavender: {
     bg: 'purple.50',
     border: 'purple.200',
-    text: 'purple.700',
-    value: 'gray.900',
+    accent: 'purple.500',
+    iconBg: 'purple.100',
+    iconColor: 'purple.600',
   },
   sky: {
     bg: 'blue.50',
     border: 'blue.200',
-    text: 'blue.700',
-    value: 'gray.900',
+    accent: 'blue.500',
+    iconBg: 'blue.100',
+    iconColor: 'blue.600',
   },
 };
 
@@ -42,42 +46,64 @@ export function StatsCard({ label, value, icon, color = 'mint', subtitle }: Stat
 
   return (
     <Box
-      p={6}
-      borderRadius="xl"
-      borderWidth="1px"
+      p={{ base: 6, md: 7 }}
+      borderRadius="2xl"
+      bg="white"
+      borderWidth="2px"
       borderColor={config.border}
-      bg={config.bg}
-      shadow="sm"
-      transition="all 0.2s"
+      shadow="lg"
+      transition="all 0.3s ease"
+      position="relative"
+      overflow="hidden"
       _hover={{
-        transform: 'translateY(-2px)',
-        shadow: 'md',
+        transform: 'translateY(-4px)',
+        shadow: 'xl',
+        borderColor: config.accent,
+      }}
+      _before={{
+        content: '""',
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        width: '4px',
+        height: '100%',
+        bg: config.accent,
       }}
     >
       <Stat.Root>
         {icon && (
-          <Box fontSize="2xl" color={config.text} mb={2}>
+          <Box
+            display="inline-flex"
+            p={3}
+            borderRadius="xl"
+            bg={config.iconBg}
+            fontSize={{ base: "2xl", md: "3xl" }}
+            color={config.iconColor}
+            mb={4}
+          >
             {icon}
           </Box>
         )}
         <Stat.Label
-          fontSize="xs"
-          color={config.text}
+          fontSize={{ base: "xs", md: "sm" }}
+          color="gray.600"
           fontWeight="semibold"
           mb={2}
+          textTransform="uppercase"
+          letterSpacing="wider"
         >
           {label}
         </Stat.Label>
         <Stat.ValueText
-          fontSize="3xl"
+          fontSize={{ base: "3xl", md: "4xl" }}
           fontWeight="bold"
-          color={config.value}
-          mb={1}
+          color="gray.900"
+          mb={2}
         >
           {value}
         </Stat.ValueText>
         {subtitle && (
-          <Text fontSize="sm" color="gray.600">
+          <Text fontSize={{ base: "xs", md: "sm" }} color="gray.700" fontWeight="medium">
             {subtitle}
           </Text>
         )}

@@ -9,12 +9,12 @@ interface StatusChartProps {
 }
 
 const COLORS = {
-  Applied: '#93c5fd',    // blue-300 - soft pastel blue
-  Screening: '#fcd34d',  // amber-300 - soft pastel yellow
-  Interview: '#c4b5fd',  // purple-300 - soft pastel purple
-  Offer: '#86efac',      // green-300 - soft pastel green
-  Rejected: '#fca5a5',   // red-300 - soft pastel red
-  Withdrawn: '#d1d5db',  // gray-300 - soft pastel gray
+  Applied: '#3b82f6',    // blue-500 - vibrant blue
+  Screening: '#f59e0b',  // amber-500 - vibrant amber
+  Interview: '#8b5cf6',  // purple-500 - vibrant purple
+  Offer: '#10b981',      // emerald-500 - vibrant green
+  Rejected: '#ef4444',   // red-500 - vibrant red
+  Withdrawn: '#6b7280',  // gray-500 - neutral gray
 };
 
 export function StatusChart({ applications }: StatusChartProps) {
@@ -40,10 +40,10 @@ export function StatusChart({ applications }: StatusChartProps) {
   const total = data.reduce((sum, item) => sum + item.value, 0);
 
   return (
-    <SimpleGrid columns={{ base: 1, lg: 2 }} gap={4} alignItems="start">
+    <SimpleGrid columns={{ base: 1, lg: 2 }} gap={{ base: 3, md: 4 }} alignItems="start">
       {/* Pie Chart */}
       <Box
-        p={4}
+        p={{ base: 3, md: 4 }}
         bg="white"
         borderRadius="lg"
         borderWidth="1px"
@@ -134,31 +134,32 @@ export function StatusChart({ applications }: StatusChartProps) {
           return (
             <Box
               key={item.name}
-              p={3}
+              p={{ base: 3, md: 4 }}
               bg="white"
               borderRadius="lg"
               borderWidth="1px"
               borderColor="gray.200"
-              borderLeftWidth="3px"
-              borderLeftColor={COLORS[item.name as keyof typeof COLORS]}
+              shadow="sm"
+              transition="all 0.2s"
+              _hover={{ shadow: 'md', borderColor: COLORS[item.name as keyof typeof COLORS] }}
             >
               <HStack justify="space-between">
-                <HStack gap={2}>
+                <HStack gap={3}>
                   <Box
-                    w={3}
-                    h={3}
-                    borderRadius="sm"
+                    w={4}
+                    h={4}
+                    borderRadius="md"
                     bg={COLORS[item.name as keyof typeof COLORS]}
                   />
-                  <Text fontWeight="semibold" color="gray.900" fontSize="sm">
+                  <Text fontWeight="semibold" color="gray.900" fontSize={{ base: "sm", md: "md" }}>
                     {item.name}
                   </Text>
                 </HStack>
-                <HStack gap={3}>
-                  <Text fontSize="xs" color="gray.600">
+                <HStack gap={{ base: 3, md: 4 }}>
+                  <Text fontSize={{ base: "xs", md: "sm" }} color="gray.800" fontWeight="medium">
                     {item.value} apps
                   </Text>
-                  <Text fontSize="sm" fontWeight="bold" color="gray.900">
+                  <Text fontSize={{ base: "sm", md: "md" }} fontWeight="bold" color="gray.900" minW="50px" textAlign="right">
                     {percentage}%
                   </Text>
                 </HStack>
