@@ -41,7 +41,10 @@ export async function predictSuccess(data: PredictionRequest): Promise<Predictio
     body: JSON.stringify(data),
   });
   if (!response.ok) {
-    throw new Error('Failed to get prediction');
+    // Include status code in error for better handling
+    const error = new Error('Failed to get prediction');
+    (error as Error & { status: number }).status = response.status;
+    throw error;
   }
   return response.json();
 }
@@ -75,7 +78,12 @@ export async function generatePredictions(applications: Application[]): Promise<
           const prediction = await predictSuccess(predictionRequest);
           predictions.set(app.id, prediction);
         } catch (error) {
-          console.error(`Failed to get prediction for application ${app.id}:`, error);
+          // Silently skip validation errors (422) - these occur when applications
+          // are missing required fields. Only log genuine errors (network issues, 500s, etc.)
+          const status = (error as Error & { status?: number }).status;
+          if (status !== 422) {
+            console.error(`Failed to get prediction for application ${app.id}:`, error);
+          }
           // Continue with other predictions even if one fails
         }
       })

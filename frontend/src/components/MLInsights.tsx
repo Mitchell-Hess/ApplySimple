@@ -11,7 +11,7 @@ interface MLInsightsProps {
   predictions?: Map<string, PredictionResponse>;
 }
 
-export function MLInsights({ applications, predictions }: MLInsightsProps) {
+export function MLInsights({ predictions }: MLInsightsProps) {
   const { colorMode } = useColorMode();
 
   // Calculate aggregate insights from predictions
