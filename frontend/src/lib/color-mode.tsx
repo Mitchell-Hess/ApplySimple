@@ -14,15 +14,18 @@ const ColorModeContext = createContext<ColorModeContextType | undefined>(undefin
 
 export function ColorModeProvider({ children }: { children: ReactNode }) {
   // Always initialize with 'light' to match SSR
-  const [colorMode, setColorModeState] = useState<ColorMode>('light');
+  const [colorMode, setColorModeState] = useState<ColorMode>(() => {
+    // Only access localStorage on client side
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('chakra-ui-color-mode') as ColorMode | null;
+      return saved || 'light';
+    }
+    return 'light';
+  });
 
   useEffect(() => {
-    // After hydration, read and apply saved color mode from localStorage
-    const saved = localStorage.getItem('chakra-ui-color-mode') as ColorMode | null;
-    const mode = saved || 'light';
-
-    // Always update state and DOM to match
-    setColorModeState(mode);
+    // Apply the color mode to DOM on mount
+    const mode = colorMode;
 
     // Ensure we properly set or remove the dark class
     if (mode === 'dark') {
@@ -30,9 +33,7 @@ export function ColorModeProvider({ children }: { children: ReactNode }) {
     } else {
       document.documentElement.classList.remove('dark');
     }
-
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-  }, []);
+  }, [colorMode]);
 
   const setColorMode = (mode: ColorMode) => {
     setColorModeState(mode);

@@ -112,7 +112,7 @@ export default function SignInPage() {
                   color="white"
                   size="lg"
                   width="100%"
-                  isLoading={isLoading}
+                  loading={isLoading}
                   _hover={{ bg: 'blue.700' }}
                 >
                   Sign In
@@ -123,7 +123,7 @@ export default function SignInPage() {
 
           <HStack justify="center" gap={2}>
             <Text color={colorMode === 'light' ? 'gray.600' : 'gray.400'}>
-              Don't have an account?
+              Don&apos;t have an account?
             </Text>
             <Link href="/auth/signup" style={{ color: '#3182ce', fontWeight: 600 }}>
               Sign Up

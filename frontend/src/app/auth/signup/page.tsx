@@ -167,7 +167,7 @@ export default function SignUpPage() {
                   color="white"
                   size="lg"
                   width="100%"
-                  isLoading={isLoading}
+                  loading={isLoading}
                   _hover={{ bg: 'blue.700' }}
                 >
                   Sign Up
