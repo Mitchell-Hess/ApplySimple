@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect, useLayoutEffect, ReactNode } from 'react';
 
 type ColorMode = 'light' | 'dark';
 
@@ -13,32 +13,26 @@ interface ColorModeContextType {
 const ColorModeContext = createContext<ColorModeContextType | undefined>(undefined);
 
 export function ColorModeProvider({ children }: { children: ReactNode }) {
-  // Always initialize with 'light' for SSR
-  const [colorMode, setColorModeState] = useState<ColorMode>('light');
-  const [isMounted, setIsMounted] = useState(false);
-
-  // Load saved color mode after mount to avoid hydration mismatch
-  useEffect(() => {
-    setIsMounted(true);
-    const saved = localStorage.getItem('chakra-ui-color-mode') as ColorMode | null;
-    if (saved && (saved === 'light' || saved === 'dark')) {
-      setColorModeState(saved);
+  // Initialize from localStorage if available, otherwise 'light'
+  const [colorMode, setColorModeState] = useState<ColorMode>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('chakra-ui-color-mode') as ColorMode | null;
+      return saved && (saved === 'light' || saved === 'dark') ? saved : 'light';
     }
-  }, []);
+    return 'light';
+  });
 
-  useEffect(() => {
+  // Use layout effect to apply theme before paint
+  useLayoutEffect(() => {
     // Apply the color mode to DOM
     if (colorMode === 'dark') {
       document.documentElement.classList.add('dark');
     } else {
       document.documentElement.classList.remove('dark');
     }
-
-    // Only save to localStorage after mount
-    if (isMounted) {
-      localStorage.setItem('chakra-ui-color-mode', colorMode);
-    }
-  }, [colorMode, isMounted]);
+    // Save to localStorage
+    localStorage.setItem('chakra-ui-color-mode', colorMode);
+  }, [colorMode]);
 
   const setColorMode = (mode: ColorMode) => {
     setColorModeState(mode);

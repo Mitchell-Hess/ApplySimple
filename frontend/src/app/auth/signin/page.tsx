@@ -2,14 +2,12 @@
 
 import { useState } from 'react';
 import { signIn } from 'next-auth/react';
-import { useRouter } from 'next/navigation';
 import { Box, Container, Heading, VStack, Button, Text, HStack, SimpleGrid, Grid } from '@chakra-ui/react';
 import { useColorMode } from '@/lib/color-mode';
 import Link from 'next/link';
 import { FiTrendingUp, FiBarChart2, FiTarget, FiCheckCircle } from 'react-icons/fi';
 
 export default function SignInPage() {
-  const router = useRouter();
   const { colorMode } = useColorMode();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
