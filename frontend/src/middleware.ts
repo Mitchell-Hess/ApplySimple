@@ -29,3 +29,6 @@ export default auth((req) => {
 export const config = {
   matcher: ['/((?!_next|favicon.ico|public).*)'],
 };
+
+// Force middleware to use Node.js runtime instead of Edge runtime
+export const runtime = 'nodejs';

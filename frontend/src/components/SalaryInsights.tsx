@@ -4,7 +4,7 @@ import { useMemo } from 'react';
 import { Box, Heading, SimpleGrid, Text, VStack, HStack, Badge } from '@chakra-ui/react';
 import { useColorMode } from '@/lib/color-mode';
 import { Application } from '@/types/application';
-import { parseSalary, formatSalary } from '@/lib/normalize';
+import { parseSalary } from '@/lib/normalize';
 
 interface SalaryInsightsProps {
   applications: Application[];

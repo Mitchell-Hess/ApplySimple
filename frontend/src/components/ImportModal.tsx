@@ -25,7 +25,7 @@ interface ColumnMapping {
 
 export function ImportModal({ isOpen, onClose, onSuccess }: ImportModalProps) {
   const { colorMode } = useColorMode();
-  const [file, setFile] = useState<File | null>(null);
+  const [, setFile] = useState<File | null>(null);
   const [csvData, setCsvData] = useState<Record<string, string>[]>([]);
   const [csvColumns, setCsvColumns] = useState<string[]>([]);
   const [columnMapping, setColumnMapping] = useState<ColumnMapping>({});
@@ -227,7 +227,7 @@ export function ImportModal({ isOpen, onClose, onSuccess }: ImportModalProps) {
       const message = `Import complete! Successfully imported ${successCount} applications. ${errorCount > 0 ? `${errorCount} failed.` : ''}`;
       onSuccess(message);
       handleClose();
-    } catch (err) {
+    } catch {
       setError('Import failed. Please try again.');
       setStep('mapping');
     }

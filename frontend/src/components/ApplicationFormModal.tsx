@@ -112,8 +112,9 @@ export function ApplicationFormModal({ application, isOpen, onClose, onSuccess }
     try {
       const dataToSubmit = {
         ...formData,
+        dateApplied: new Date(formData.dateApplied),
         numberOfRounds: formData.numberOfRounds || undefined,
-        dateOfOutcome: formData.dateOfOutcome || undefined,
+        dateOfOutcome: formData.dateOfOutcome ? new Date(formData.dateOfOutcome) : undefined,
       };
 
       if (application) {
