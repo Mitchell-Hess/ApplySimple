@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useState, useEffect, useLayoutEffect, ReactNode } from 'react';
+import { createContext, useContext, useState, useLayoutEffect, ReactNode } from 'react';
 
 type ColorMode = 'light' | 'dark';
 

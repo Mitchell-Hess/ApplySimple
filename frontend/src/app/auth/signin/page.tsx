@@ -33,13 +33,15 @@ export default function SignInPage() {
       const result = await signIn('credentials', {
         email,
         password,
-        callbackUrl: '/',
+        redirect: false,
       });
 
       if (result?.error) {
         setError('Invalid email or password');
+      } else if (result?.ok) {
+        // Redirect on successful sign in
+        window.location.href = '/';
       }
-      // If successful, NextAuth will handle the redirect automatically
     } catch (err) {
       setError('An error occurred. Please try again.');
       console.error('Sign in error:', err);
