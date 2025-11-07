@@ -24,16 +24,38 @@ import { useSession, signOut } from 'next-auth/react';
 export default function Home() {
   const { colorMode } = useColorMode();
   const queryClient = useQueryClient();
-  const { data: session } = useSession();
+  const { data: session, status: sessionStatus } = useSession();
+
+  // Debug logging
+  useEffect(() => {
+    console.log('Session status:', sessionStatus);
+    console.log('Session data:', session);
+  }, [sessionStatus, session]);
 
   const { data: applications, isLoading: appsLoading, error: appsError } = useQuery({
     queryKey: ['applications'],
-    queryFn: fetchApplications,
+    queryFn: async () => {
+      console.log('Fetching applications...');
+      const result = await fetchApplications();
+      console.log('Applications fetched:', result?.length);
+      return result;
+    },
+    enabled: sessionStatus === 'authenticated',
+    retry: 2,
+    staleTime: 0,
   });
 
   const { data: stats, isLoading: statsLoading, error: statsError } = useQuery({
     queryKey: ['stats'],
-    queryFn: fetchStats,
+    queryFn: async () => {
+      console.log('Fetching stats...');
+      const result = await fetchStats();
+      console.log('Stats fetched:', result);
+      return result;
+    },
+    enabled: sessionStatus === 'authenticated',
+    retry: 2,
+    staleTime: 0,
   });
 
   const [filters, setFilters] = useState<FilterState>({
@@ -301,7 +323,7 @@ export default function Home() {
     });
   }, [applications, filters]);
 
-  const isLoading = appsLoading || statsLoading;
+  const isLoading = sessionStatus === 'loading' || appsLoading || statsLoading;
   const error = appsError || statsError;
 
   if (isLoading) {

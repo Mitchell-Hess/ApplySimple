@@ -6,7 +6,11 @@ export const metadata: Metadata = {
   title: 'ApplySimple - Job Application Tracker',
   description: 'Track your job applications with ease',
   icons: {
-    icon: '/favicon.svg',
+    icon: [
+      { url: '/favicon.svg', type: 'image/svg+xml' },
+    ],
+    shortcut: '/favicon.svg',
+    apple: '/favicon.svg',
   },
 };
 

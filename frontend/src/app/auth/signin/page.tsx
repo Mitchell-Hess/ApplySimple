@@ -35,15 +35,13 @@ export default function SignInPage() {
       const result = await signIn('credentials', {
         email,
         password,
-        redirect: false,
+        callbackUrl: '/',
       });
 
       if (result?.error) {
         setError('Invalid email or password');
-      } else {
-        router.push('/');
-        router.refresh();
       }
+      // If successful, NextAuth will handle the redirect automatically
     } catch (err) {
       setError('An error occurred. Please try again.');
       console.error('Sign in error:', err);
@@ -123,9 +121,9 @@ export default function SignInPage() {
                   <VStack align="start" gap={3}>
                     <Box
                       p={2.5}
-                      bg={colorMode === 'light' ? 'indigo.50' : 'indigo.900'}
+                      bg={colorMode === 'light' ? 'indigo.50' : 'indigo.800'}
                       borderRadius="lg"
-                      color={colorMode === 'light' ? 'indigo.600' : 'indigo.300'}
+                      color={colorMode === 'light' ? 'indigo.600' : 'indigo.200'}
                     >
                       <feature.icon size={22} />
                     </Box>
@@ -146,10 +144,10 @@ export default function SignInPage() {
             <Box
               display={{ base: 'none', lg: 'block' }}
               p={5}
-              bg={colorMode === 'light' ? 'indigo.50' : 'indigo.900/30'}
+              bg={colorMode === 'light' ? 'indigo.50' : 'gray.800'}
               borderRadius="xl"
               borderWidth="1px"
-              borderColor={colorMode === 'light' ? 'indigo.200' : 'indigo.800'}
+              borderColor={colorMode === 'light' ? 'indigo.200' : 'indigo.700'}
             >
               <VStack align="start" gap={2}>
                 <Text fontWeight="semibold" color={colorMode === 'light' ? 'indigo.900' : 'indigo.200'}>
