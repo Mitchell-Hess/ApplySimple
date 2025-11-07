@@ -62,7 +62,7 @@ export function StatusChart({ applications }: StatusChartProps) {
                 stroke: '#9ca3af',
                 strokeWidth: 1.5,
               }}
-              label={(props: { cx: number; cy: number; midAngle: number; outerRadius: number; name: string; percent: number; value: number }) => {
+              label={(props: any) => {
                 const RADIAN = Math.PI / 180;
                 const { cx, cy, midAngle, outerRadius, name, percent, value } = props;
                 const radius = outerRadius + 35;

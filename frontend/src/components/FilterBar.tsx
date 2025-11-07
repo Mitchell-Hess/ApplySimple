@@ -86,7 +86,7 @@ export function FilterBar({ filters, onFilterChange, availableSources, available
             <Box
               as="select"
               value={filters.status}
-              onChange={(e: React.ChangeEvent<HTMLSelectElement>) => handleInputChange('status', e.target.value)}
+              onChange={(e: any) => handleInputChange('status', e.target.value)}
               px={4}
               py={2}
               fontSize="md"
@@ -118,7 +118,7 @@ export function FilterBar({ filters, onFilterChange, availableSources, available
             <Box
               as="select"
               value={filters.source}
-              onChange={(e: React.ChangeEvent<HTMLSelectElement>) => handleInputChange('source', e.target.value)}
+              onChange={(e: any) => handleInputChange('source', e.target.value)}
               px={4}
               py={2}
               fontSize="md"
@@ -149,7 +149,7 @@ export function FilterBar({ filters, onFilterChange, availableSources, available
             <Box
               as="select"
               value={filters.jobType}
-              onChange={(e: React.ChangeEvent<HTMLSelectElement>) => handleInputChange('jobType', e.target.value)}
+              onChange={(e: any) => handleInputChange('jobType', e.target.value)}
               px={4}
               py={2}
               fontSize="md"
