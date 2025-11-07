@@ -263,24 +263,44 @@ export function MLInsights({ predictions }: MLInsightsProps) {
                 Key Success Factors
               </Text>
               <HStack gap={2} flexWrap="wrap">
-                {insights.topFactors.map((factor, index) => (
-                  <Badge
-                    key={factor}
-                    px={3}
-                    py={1}
-                    borderRadius="md"
-                    bg={
-                      factor === 'workType' ? 'gray.700' :
-                      index === 0 ? 'blue.600' :
-                      index === 1 ? 'purple.600' :
-                      'indigo.600'
+                {insights.topFactors.map((factor, index) => {
+                  const getBadgeColors = () => {
+                    if (factor === 'source') {
+                      return {
+                        bg: colorMode === 'light' ? 'orange.500' : 'orange.600',
+                        color: 'white'
+                      };
                     }
-                    color="white"
-                    fontSize={{ base: "xs", md: "sm" }}
-                  >
-                    {factor}
-                  </Badge>
-                ))}
+                    if (factor === 'workType') {
+                      return {
+                        bg: colorMode === 'light' ? 'gray.600' : 'gray.500',
+                        color: 'white'
+                      };
+                    }
+                    const colors = [
+                      { bg: 'blue.600', color: 'white' },
+                      { bg: 'purple.600', color: 'white' },
+                      { bg: 'indigo.600', color: 'white' }
+                    ];
+                    return colors[index] || colors[0];
+                  };
+
+                  const badgeColors = getBadgeColors();
+
+                  return (
+                    <Badge
+                      key={factor}
+                      px={3}
+                      py={1}
+                      borderRadius="md"
+                      bg={badgeColors.bg}
+                      color={badgeColors.color}
+                      fontSize={{ base: "xs", md: "sm" }}
+                    >
+                      {factor}
+                    </Badge>
+                  );
+                })}
               </HStack>
               <Text fontSize={{ base: "xs", md: "sm" }} color={colorMode === 'light' ? 'gray.600' : 'gray.400'}>
                 These factors appear most frequently in your application predictions
