@@ -1,34 +1,33 @@
-import { auth } from '@/lib/auth';
 import { NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
 
-export default auth((req) => {
-  const { nextUrl } = req;
-  const isLoggedIn = !!req.auth;
-
-  const isAuthPage = nextUrl.pathname.startsWith('/auth');
-  const isApiAuthRoute = nextUrl.pathname.startsWith('/api/auth');
+export function middleware(request: NextRequest) {
+  const { pathname } = request.nextUrl;
 
   // Allow API auth routes
-  if (isApiAuthRoute) {
+  if (pathname.startsWith('/api/auth')) {
     return NextResponse.next();
   }
 
+  // Check if user has session token
+  const sessionToken = request.cookies.get('authjs.session-token') || request.cookies.get('__Secure-authjs.session-token');
+  const isLoggedIn = !!sessionToken;
+
+  const isAuthPage = pathname.startsWith('/auth');
+
   // Redirect logged-in users away from auth pages
   if (isAuthPage && isLoggedIn) {
-    return NextResponse.redirect(new URL('/', nextUrl));
+    return NextResponse.redirect(new URL('/', request.url));
   }
 
   // Redirect non-logged-in users to sign in
   if (!isAuthPage && !isLoggedIn) {
-    return NextResponse.redirect(new URL('/auth/signin', nextUrl));
+    return NextResponse.redirect(new URL('/auth/signin', request.url));
   }
 
   return NextResponse.next();
-});
+}
 
 export const config = {
   matcher: ['/((?!_next|favicon.ico|public).*)'],
 };
-
-// Force middleware to use Node.js runtime instead of Edge runtime
-export const runtime = 'nodejs';
