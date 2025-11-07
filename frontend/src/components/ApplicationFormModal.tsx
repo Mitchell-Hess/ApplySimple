@@ -19,6 +19,8 @@ interface ApplicationFormModalProps {
   onSuccess: () => void;
 }
 
+type StatusType = 'Applied' | 'Screening' | 'Interview' | 'Offer' | 'Rejected' | 'Withdrawn';
+
 export function ApplicationFormModal({ application, isOpen, onClose, onSuccess }: ApplicationFormModalProps) {
   const { colorMode } = useColorMode();
   const [formData, setFormData] = useState({
@@ -33,7 +35,7 @@ export function ApplicationFormModal({ application, isOpen, onClose, onSuccess }
     numberOfRounds: undefined as number | undefined,
     dateOfOutcome: '',
     notes: '',
-    status: 'Applied',
+    status: 'Applied' as StatusType,
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
@@ -98,7 +100,7 @@ export function ApplicationFormModal({ application, isOpen, onClose, onSuccess }
         numberOfRounds: undefined,
         dateOfOutcome: '',
         notes: '',
-        status: 'Applied',
+        status: 'Applied' as StatusType,
       });
     }
     setError('');
@@ -268,7 +270,7 @@ export function ApplicationFormModal({ application, isOpen, onClose, onSuccess }
               <Text mb={1} fontWeight="medium">Status</Text>
               <select
                 value={formData.status}
-                onChange={(e) => setFormData({ ...formData, status: e.target.value })}
+                onChange={(e) => setFormData({ ...formData, status: e.target.value as StatusType })}
                 style={inputStyle}
               >
                 <option value="Applied">Applied</option>

@@ -23,7 +23,7 @@ export interface Application {
   notes?: string;                // Your column: "Notes"
 
   // Status (computed)
-  status: 'Applied' | 'Interview' | 'Rejected' | 'Offer';
+  status: 'Applied' | 'Screening' | 'Interview' | 'Offer' | 'Rejected' | 'Withdrawn';
 
   // ML Predictions
   predictedSuccess?: number;
