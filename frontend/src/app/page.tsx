@@ -2,7 +2,7 @@
 
 import { Box, Container, Heading, SimpleGrid, Spinner, Text, VStack, HStack, Badge, Button } from '@chakra-ui/react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { fetchApplications, fetchStats, generatePredictions, deleteApplication } from '@/lib/api';
+import { fetchApplications, fetchStats, generatePredictions, deleteApplication, deleteAllApplications } from '@/lib/api';
 import { StatsCard } from '@/components/StatsCard';
 import { ApplicationsTable } from '@/components/ApplicationsTable';
 import { StatusChart } from '@/components/StatusChart';
@@ -178,6 +178,41 @@ export default function Home() {
           });
         } finally {
           setIsNormalizing(false);
+        }
+      },
+    });
+  };
+
+  const handleDeleteAll = () => {
+    const totalApps = applications?.length || 0;
+
+    setConfirmDialog({
+      isOpen: true,
+      title: 'Delete All Applications',
+      message: `Are you sure you want to delete ALL ${totalApps} application(s)? This action cannot be undone and will permanently remove all your data.`,
+      onConfirm: async () => {
+        setConfirmDialog({ ...confirmDialog, isOpen: false });
+        try {
+          const result = await deleteAllApplications();
+
+          // Refresh data
+          queryClient.invalidateQueries({ queryKey: ['applications'] });
+          queryClient.invalidateQueries({ queryKey: ['stats'] });
+
+          setAlertDialog({
+            isOpen: true,
+            title: 'Success',
+            message: result.message,
+            type: 'success',
+          });
+        } catch (error) {
+          console.error('Delete all error:', error);
+          setAlertDialog({
+            isOpen: true,
+            title: 'Error',
+            message: 'Failed to delete applications. Please try again.',
+            type: 'error',
+          });
         }
       },
     });
@@ -373,17 +408,41 @@ export default function Home() {
                 <Button
                   onClick={handleNormalizeData}
                   size="sm"
-                  variant="outline"
-                  colorPalette="blue"
+                  bg={colorMode === 'light' ? 'white' : 'blue.600'}
+                  color={colorMode === 'light' ? 'blue.600' : 'white'}
+                  borderWidth="2px"
+                  borderColor={colorMode === 'light' ? 'blue.600' : 'blue.600'}
                   disabled={isNormalizing}
+                  _hover={{
+                    bg: colorMode === 'light' ? 'blue.50' : 'blue.700',
+                  }}
                 >
                   {isNormalizing ? 'Normalizing...' : 'Normalize Data'}
                 </Button>
                 <Button
+                  onClick={handleDeleteAll}
+                  size="sm"
+                  bg={colorMode === 'light' ? 'white' : 'red.600'}
+                  color={colorMode === 'light' ? 'red.600' : 'white'}
+                  borderWidth="2px"
+                  borderColor={colorMode === 'light' ? 'red.600' : 'red.600'}
+                  disabled={!applications || applications.length === 0}
+                  _hover={{
+                    bg: colorMode === 'light' ? 'red.50' : 'red.700',
+                  }}
+                >
+                  Delete All
+                </Button>
+                <Button
                   onClick={() => signOut()}
                   size="sm"
-                  variant="outline"
-                  colorPalette="red"
+                  bg={colorMode === 'light' ? 'white' : 'red.600'}
+                  color={colorMode === 'light' ? 'red.600' : 'white'}
+                  borderWidth="2px"
+                  borderColor={colorMode === 'light' ? 'red.600' : 'red.600'}
+                  _hover={{
+                    bg: colorMode === 'light' ? 'red.50' : 'red.700',
+                  }}
                 >
                   Sign Out
                 </Button>
@@ -448,19 +507,19 @@ export default function Home() {
               bg={colorMode === 'light' ? 'white' : 'gray.800'}
               borderRadius="2xl"
               borderWidth="2px"
-              borderColor="green.200"
+              borderColor={colorMode === 'light' ? 'green.200' : 'gray.600'}
               shadow="md"
               transition="all 0.3s ease"
               _hover={{
                 transform: 'translateY(-2px)',
                 shadow: 'lg',
-                borderColor: 'green.400',
+                borderColor: colorMode === 'light' ? 'green.400' : 'gray.500',
               }}
             >
               <Text fontSize={{ base: "xs", md: "sm" }} color={colorMode === 'light' ? 'gray.600' : 'gray.400'} mb={2} fontWeight="semibold" textTransform="uppercase" letterSpacing="wide">
                 Top Source
               </Text>
-              <Text fontSize={{ base: "2xl", md: "3xl" }} fontWeight="bold" color="green.700">
+              <Text fontSize={{ base: "2xl", md: "3xl" }} fontWeight="bold" color={colorMode === 'light' ? 'green.700' : 'green.400'}>
                 {topSource?.source || 'N/A'}
               </Text>
               <Text fontSize={{ base: "xs", md: "sm" }} color={colorMode === 'light' ? 'gray.800' : 'gray.300'} mt={1} fontWeight="medium">
@@ -473,19 +532,19 @@ export default function Home() {
               bg={colorMode === 'light' ? 'white' : 'gray.800'}
               borderRadius="2xl"
               borderWidth="2px"
-              borderColor="orange.200"
+              borderColor={colorMode === 'light' ? 'orange.200' : 'gray.600'}
               shadow="md"
               transition="all 0.3s ease"
               _hover={{
                 transform: 'translateY(-2px)',
                 shadow: 'lg',
-                borderColor: 'orange.400',
+                borderColor: colorMode === 'light' ? 'orange.400' : 'gray.500',
               }}
             >
               <Text fontSize={{ base: "xs", md: "sm" }} color={colorMode === 'light' ? 'gray.600' : 'gray.400'} mb={2} fontWeight="semibold" textTransform="uppercase" letterSpacing="wide">
                 Remote Jobs
               </Text>
-              <Text fontSize={{ base: "2xl", md: "3xl" }} fontWeight="bold" color="orange.600">
+              <Text fontSize={{ base: "2xl", md: "3xl" }} fontWeight="bold" color={colorMode === 'light' ? 'orange.600' : 'orange.400'}>
                 {remoteJobs}
               </Text>
               <Text fontSize={{ base: "xs", md: "sm" }} color={colorMode === 'light' ? 'gray.800' : 'gray.300'} mt={1} fontWeight="medium">
@@ -498,19 +557,19 @@ export default function Home() {
               bg={colorMode === 'light' ? 'white' : 'gray.800'}
               borderRadius="2xl"
               borderWidth="2px"
-              borderColor="pink.200"
+              borderColor={colorMode === 'light' ? 'pink.200' : 'gray.600'}
               shadow="md"
               transition="all 0.3s ease"
               _hover={{
                 transform: 'translateY(-2px)',
                 shadow: 'lg',
-                borderColor: 'pink.400',
+                borderColor: colorMode === 'light' ? 'pink.400' : 'gray.500',
               }}
             >
               <Text fontSize={{ base: "xs", md: "sm" }} color={colorMode === 'light' ? 'gray.600' : 'gray.400'} mb={2} fontWeight="semibold" textTransform="uppercase" letterSpacing="wide">
                 Cover Letters
               </Text>
-              <Text fontSize={{ base: "2xl", md: "3xl" }} fontWeight="bold" color="pink.600">
+              <Text fontSize={{ base: "2xl", md: "3xl" }} fontWeight="bold" color={colorMode === 'light' ? 'pink.600' : 'pink.400'}>
                 {stats?.withCoverLetters || 0}
               </Text>
               <Text fontSize={{ base: "xs", md: "sm" }} color={colorMode === 'light' ? 'gray.800' : 'gray.300'} mt={1} fontWeight="medium">
@@ -523,19 +582,19 @@ export default function Home() {
               bg={colorMode === 'light' ? 'white' : 'gray.800'}
               borderRadius="2xl"
               borderWidth="2px"
-              borderColor="#c7d2fe"
+              borderColor={colorMode === 'light' ? '#c7d2fe' : 'gray.600'}
               shadow="md"
               transition="all 0.3s ease"
               _hover={{
                 transform: 'translateY(-2px)',
                 shadow: 'lg',
-                borderColor: '#818cf8',
+                borderColor: colorMode === 'light' ? '#818cf8' : 'gray.500',
               }}
             >
               <Text fontSize={{ base: "xs", md: "sm" }} color={colorMode === 'light' ? 'gray.600' : 'gray.400'} mb={2} fontWeight="semibold" textTransform="uppercase" letterSpacing="wide">
                 Active Pipeline
               </Text>
-              <Text fontSize={{ base: "2xl", md: "3xl" }} fontWeight="bold" color="indigo.600">
+              <Text fontSize={{ base: "2xl", md: "3xl" }} fontWeight="bold" color={colorMode === 'light' ? 'indigo.600' : 'indigo.400'}>
                 {activeApplications + interviews}
               </Text>
               <Text fontSize={{ base: "xs", md: "sm" }} color={colorMode === 'light' ? 'gray.800' : 'gray.300'} mt={1} fontWeight="medium">

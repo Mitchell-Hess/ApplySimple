@@ -158,7 +158,22 @@ export async function DELETE(request: NextRequest) {
 
     const searchParams = request.nextUrl.searchParams;
     const id = searchParams.get('id');
+    const deleteAll = searchParams.get('deleteAll');
 
+    // Handle delete all applications
+    if (deleteAll === 'true') {
+      const result = await prisma.application.deleteMany({
+        where: { userId: session.user.id },
+      });
+
+      return NextResponse.json({
+        success: true,
+        deletedCount: result.count,
+        message: `Successfully deleted ${result.count} application(s)`
+      });
+    }
+
+    // Handle single application deletion
     if (!id) {
       return NextResponse.json(
         { error: 'Application ID is required' },

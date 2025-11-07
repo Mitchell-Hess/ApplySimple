@@ -1,5 +1,14 @@
 import * as React from 'react';
 import { Providers } from '@/components/Providers';
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'ApplySimple - Job Application Tracker',
+  description: 'Track your job applications with ease',
+  icons: {
+    icon: '/favicon.svg',
+  },
+};
 
 export default function RootLayout({
   children,

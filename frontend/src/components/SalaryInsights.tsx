@@ -139,7 +139,7 @@ export function SalaryInsights({ applications }: SalaryInsightsProps) {
             bg={colorMode === 'light' ? 'blue.50' : 'gray.700'}
             borderRadius="xl"
             borderWidth="2px"
-            borderColor={colorMode === 'light' ? 'blue.200' : 'blue.800'}
+            borderColor={colorMode === 'light' ? 'blue.200' : 'gray.600'}
           >
             <Text fontSize={{ base: "xs", md: "sm" }} color={colorMode === 'light' ? 'blue.600' : 'blue.300'} mb={1} fontWeight="semibold">
               Average Salary
@@ -154,7 +154,7 @@ export function SalaryInsights({ applications }: SalaryInsightsProps) {
             bg={colorMode === 'light' ? 'green.50' : 'gray.700'}
             borderRadius="xl"
             borderWidth="2px"
-            borderColor={colorMode === 'light' ? 'green.200' : 'green.800'}
+            borderColor={colorMode === 'light' ? 'green.200' : 'gray.600'}
           >
             <Text fontSize={{ base: "xs", md: "sm" }} color={colorMode === 'light' ? 'green.600' : 'green.300'} mb={1} fontWeight="semibold">
               Median Salary
@@ -169,7 +169,7 @@ export function SalaryInsights({ applications }: SalaryInsightsProps) {
             bg={colorMode === 'light' ? 'purple.50' : 'gray.700'}
             borderRadius="xl"
             borderWidth="2px"
-            borderColor={colorMode === 'light' ? 'purple.200' : 'purple.800'}
+            borderColor={colorMode === 'light' ? 'purple.200' : 'gray.600'}
           >
             <Text fontSize={{ base: "xs", md: "sm" }} color={colorMode === 'light' ? 'purple.600' : 'purple.300'} mb={1} fontWeight="semibold">
               Minimum
@@ -184,7 +184,7 @@ export function SalaryInsights({ applications }: SalaryInsightsProps) {
             bg={colorMode === 'light' ? 'orange.50' : 'gray.700'}
             borderRadius="xl"
             borderWidth="2px"
-            borderColor={colorMode === 'light' ? 'orange.200' : 'orange.800'}
+            borderColor={colorMode === 'light' ? 'orange.200' : 'gray.600'}
           >
             <Text fontSize={{ base: "xs", md: "sm" }} color={colorMode === 'light' ? 'orange.600' : 'orange.300'} mb={1} fontWeight="semibold">
               Maximum

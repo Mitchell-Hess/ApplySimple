@@ -73,12 +73,12 @@ export function SourceAnalytics({ stats }: SourceAnalyticsProps) {
                 borderRadius="xl"
                 bg={colorMode === 'light' ? 'white' : 'gray.700'}
                 borderWidth="2px"
-                borderColor={`${color}.200`}
+                borderColor={colorMode === 'light' ? `${color}.200` : 'gray.600'}
                 transition="all 0.3s ease"
                 _hover={{
                   transform: 'translateY(-2px)',
                   shadow: 'md',
-                  borderColor: `${color}.400`,
+                  borderColor: colorMode === 'light' ? `${color}.400` : 'gray.500',
                 }}
               >
                 <HStack justify="space-between" mb={3}>

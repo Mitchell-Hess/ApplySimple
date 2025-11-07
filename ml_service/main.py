@@ -19,7 +19,14 @@ app = FastAPI(
 # Configure CORS to allow requests from Next.js frontend
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://localhost:3001"],
+    allow_origins=[
+        "http://localhost:3000",
+        "http://localhost:3001",
+        "https://applysimple.xyz",
+        "https://www.applysimple.xyz",
+        "https://applysimple.vercel.app",
+        "https://*.vercel.app",  # Allow all Vercel preview deployments
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -185,4 +192,8 @@ async def batch_predict(applications: list[ApplicationData]):
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    import os
+
+    # Use PORT from environment (Railway sets this) or default to 8000
+    port = int(os.environ.get("PORT", 8000))
+    uvicorn.run(app, host="0.0.0.0", port=port)

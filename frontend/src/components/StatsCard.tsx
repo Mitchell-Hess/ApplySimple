@@ -52,7 +52,7 @@ export function StatsCard({ label, value, icon, color = 'mint', subtitle }: Stat
       borderRadius="2xl"
       bg={colorMode === 'light' ? 'white' : 'gray.800'}
       borderWidth="2px"
-      borderColor={config.border}
+      borderColor={colorMode === 'light' ? config.border : 'gray.600'}
       shadow="lg"
       transition="all 0.3s ease"
       position="relative"
@@ -60,7 +60,7 @@ export function StatsCard({ label, value, icon, color = 'mint', subtitle }: Stat
       _hover={{
         transform: 'translateY(-4px)',
         shadow: 'xl',
-        borderColor: config.accent,
+        borderColor: colorMode === 'light' ? config.accent : 'gray.500',
       }}
       _before={{
         content: '""',

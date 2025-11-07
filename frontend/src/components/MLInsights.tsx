@@ -123,12 +123,12 @@ export function MLInsights({ predictions }: MLInsightsProps) {
             borderRadius="xl"
             bg={colorMode === 'light' ? 'white' : 'gray.700'}
             borderWidth="2px"
-            borderColor={`${getSuccessColor(insights.avgSuccessProbability)}.200`}
+            borderColor={colorMode === 'light' ? `${getSuccessColor(insights.avgSuccessProbability)}.200` : 'gray.600'}
             transition="all 0.3s ease"
             _hover={{
               transform: 'translateY(-2px)',
               shadow: 'md',
-              borderColor: `${getSuccessColor(insights.avgSuccessProbability)}.400`,
+              borderColor: colorMode === 'light' ? `${getSuccessColor(insights.avgSuccessProbability)}.400` : 'gray.500',
             }}
           >
             <VStack align="start" gap={3}>
@@ -160,12 +160,12 @@ export function MLInsights({ predictions }: MLInsightsProps) {
             borderRadius="xl"
             bg={colorMode === 'light' ? 'white' : 'gray.700'}
             borderWidth="2px"
-            borderColor="indigo.200"
+            borderColor={colorMode === 'light' ? 'indigo.200' : 'gray.600'}
             transition="all 0.3s ease"
             _hover={{
               transform: 'translateY(-2px)',
               shadow: 'md',
-              borderColor: 'indigo.400',
+              borderColor: colorMode === 'light' ? 'indigo.400' : 'gray.500',
             }}
           >
             <VStack align="start" gap={3}>
@@ -197,12 +197,12 @@ export function MLInsights({ predictions }: MLInsightsProps) {
             borderRadius="xl"
             bg={colorMode === 'light' ? 'white' : 'gray.700'}
             borderWidth="2px"
-            borderColor="emerald.200"
+            borderColor={colorMode === 'light' ? 'emerald.200' : 'gray.600'}
             transition="all 0.3s ease"
             _hover={{
               transform: 'translateY(-2px)',
               shadow: 'md',
-              borderColor: 'emerald.400',
+              borderColor: colorMode === 'light' ? 'emerald.400' : 'gray.500',
             }}
           >
             <VStack align="start" gap={3}>
@@ -227,12 +227,12 @@ export function MLInsights({ predictions }: MLInsightsProps) {
             borderRadius="xl"
             bg={colorMode === 'light' ? 'white' : 'gray.700'}
             borderWidth="2px"
-            borderColor="purple.200"
+            borderColor={colorMode === 'light' ? 'purple.200' : 'gray.600'}
             transition="all 0.3s ease"
             _hover={{
               transform: 'translateY(-2px)',
               shadow: 'md',
-              borderColor: 'purple.400',
+              borderColor: colorMode === 'light' ? 'purple.400' : 'gray.500',
             }}
           >
             <VStack align="start" gap={3}>

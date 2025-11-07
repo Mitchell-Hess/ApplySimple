@@ -55,6 +55,16 @@ export async function deleteApplication(id: string): Promise<void> {
   }
 }
 
+export async function deleteAllApplications(): Promise<{ deletedCount: number; message: string }> {
+  const response = await fetch(`${API_BASE}/applications?deleteAll=true`, {
+    method: 'DELETE',
+  });
+  if (!response.ok) {
+    throw new Error('Failed to delete all applications');
+  }
+  return response.json();
+}
+
 export async function predictSuccess(data: PredictionRequest): Promise<PredictionResponse> {
   const response = await fetch(`${API_BASE}/predict`, {
     method: 'POST',

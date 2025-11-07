@@ -1,19 +1,19 @@
 'use client';
 
 import { useState } from 'react';
-import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { Box, Container, Heading, VStack, Button, Text, HStack } from '@chakra-ui/react';
 import { useColorMode } from '@/lib/color-mode';
 import Link from 'next/link';
 
-export default function SignInPage() {
+export default function ForgotPasswordPage() {
   const router = useRouter();
   const { colorMode } = useColorMode();
   const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [resetUrl, setResetUrl] = useState('');
 
   const inputStyle: React.CSSProperties = {
     width: '100%',
@@ -28,24 +28,32 @@ export default function SignInPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    setSuccess('');
+    setResetUrl('');
     setIsLoading(true);
 
     try {
-      const result = await signIn('credentials', {
-        email,
-        password,
-        redirect: false,
+      const response = await fetch('/api/auth/forgot-password', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email }),
       });
 
-      if (result?.error) {
-        setError('Invalid email or password');
+      const data = await response.json();
+
+      if (response.ok) {
+        setSuccess(data.message);
+        if (data.resetUrl) {
+          setResetUrl(data.resetUrl);
+        }
       } else {
-        router.push('/');
-        router.refresh();
+        setError(data.error || 'An error occurred. Please try again.');
       }
     } catch (err) {
       setError('An error occurred. Please try again.');
-      console.error('Sign in error:', err);
+      console.error('Forgot password error:', err);
     } finally {
       setIsLoading(false);
     }
@@ -57,10 +65,10 @@ export default function SignInPage() {
         <VStack gap={8} align="stretch">
           <VStack gap={2}>
             <Heading size="2xl" color={colorMode === 'light' ? 'gray.900' : 'white'}>
-              Welcome Back
+              Forgot Password?
             </Heading>
-            <Text color={colorMode === 'light' ? 'gray.600' : 'gray.400'}>
-              Sign in to your ApplySimple account
+            <Text color={colorMode === 'light' ? 'gray.600' : 'gray.400'} textAlign="center">
+              Enter your email address and we&apos;ll send you a link to reset your password.
             </Text>
           </VStack>
 
@@ -86,29 +94,30 @@ export default function SignInPage() {
                   />
                 </Box>
 
-                <Box>
-                  <HStack justify="space-between" mb={2}>
-                    <Text fontWeight="medium" fontSize="sm">
-                      Password
-                    </Text>
-                    <Link href="/auth/forgot-password" style={{ color: '#3182ce', fontSize: '14px' }}>
-                      Forgot?
-                    </Link>
-                  </HStack>
-                  <input
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                    placeholder="••••••••"
-                    style={inputStyle}
-                  />
-                </Box>
-
                 {error && (
-                  <Text color="red.500" fontSize="sm">
-                    {error}
-                  </Text>
+                  <Box p={3} borderRadius="md" bg="red.50" borderWidth="1px" borderColor="red.200">
+                    <Text color="red.700" fontSize="sm">
+                      {error}
+                    </Text>
+                  </Box>
+                )}
+
+                {success && (
+                  <Box p={3} borderRadius="md" bg="green.50" borderWidth="1px" borderColor="green.200">
+                    <Text color="green.700" fontSize="sm" mb={resetUrl ? 2 : 0}>
+                      {success}
+                    </Text>
+                    {resetUrl && (
+                      <Box mt={2}>
+                        <Text color="green.700" fontSize="xs" fontWeight="bold" mb={1}>
+                          Development Mode - Reset Link:
+                        </Text>
+                        <Link href={resetUrl} style={{ color: '#2563eb', fontSize: '12px', wordBreak: 'break-all' }}>
+                          Click here to reset password
+                        </Link>
+                      </Box>
+                    )}
+                  </Box>
                 )}
 
                 <Button
@@ -118,9 +127,10 @@ export default function SignInPage() {
                   size="lg"
                   width="100%"
                   loading={isLoading}
+                  disabled={isLoading}
                   _hover={{ bg: 'blue.700' }}
                 >
-                  Sign In
+                  {isLoading ? 'Sending...' : 'Send Reset Link'}
                 </Button>
               </VStack>
             </form>
@@ -128,10 +138,10 @@ export default function SignInPage() {
 
           <HStack justify="center" gap={2}>
             <Text color={colorMode === 'light' ? 'gray.600' : 'gray.400'}>
-              Don&apos;t have an account?
+              Remember your password?
             </Text>
-            <Link href="/auth/signup" style={{ color: '#3182ce', fontWeight: 600 }}>
-              Sign Up
+            <Link href="/auth/signin" style={{ color: '#3182ce', fontWeight: 600 }}>
+              Sign In
             </Link>
           </HStack>
         </VStack>
