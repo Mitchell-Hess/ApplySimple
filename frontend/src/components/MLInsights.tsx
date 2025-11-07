@@ -239,7 +239,7 @@ export function MLInsights({ predictions }: MLInsightsProps) {
               <Text fontSize={{ base: "xs", md: "sm" }} color={colorMode === 'light' ? 'gray.600' : 'gray.400'} fontWeight="semibold" textTransform="uppercase">
                 Opportunity Rate
               </Text>
-              <Text fontSize={{ base: "2xl", md: "3xl" }} fontWeight="bold" color="purple.600">
+              <Text fontSize={{ base: "2xl", md: "3xl" }} fontWeight="bold" color={colorMode === 'light' ? 'purple.600' : 'purple.400'}>
                 {((insights.highProbabilityCount / insights.totalPredictions) * 100).toFixed(0)}%
               </Text>
               <Text fontSize={{ base: "xs", md: "sm" }} color={colorMode === 'light' ? 'gray.600' : 'gray.400'}>
