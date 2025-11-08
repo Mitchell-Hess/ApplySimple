@@ -20,7 +20,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" style={{ overflowX: 'hidden' }}>
+    <html lang="en" style={{ overflowX: 'hidden' }} suppressHydrationWarning>
       <body style={{ overflowX: 'hidden', margin: 0, padding: 0 }}>
         <Providers>
           {children}
