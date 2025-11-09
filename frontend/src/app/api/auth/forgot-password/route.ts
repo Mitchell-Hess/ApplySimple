@@ -59,12 +59,16 @@ export async function POST(request: NextRequest) {
 
     const resetUrl = `${process.env.NEXTAUTH_URL}/auth/reset-password?token=${token}`;
 
-    // Send email in production, log in development
-    if (process.env.NODE_ENV === 'production' && process.env.RESEND_API_KEY) {
-      try {
-        const resend = new Resend(process.env.RESEND_API_KEY);
+    // Send email in production if Resend is configured, otherwise log warning
+    if (process.env.NODE_ENV === 'production') {
+      if (!process.env.RESEND_API_KEY) {
+        console.warn('RESEND_API_KEY not configured. Password reset emails will not be sent. Reset URL:', resetUrl);
+        // Still return success - the token is created, just email not sent
+      } else {
+        try {
+          const resend = new Resend(process.env.RESEND_API_KEY);
 
-        await resend.emails.send({
+          await resend.emails.send({
           from: process.env.EMAIL_FROM || 'ApplySimple <onboarding@resend.dev>',
           to: email,
           subject: 'Reset Your Password - ApplySimple',
@@ -110,9 +114,10 @@ export async function POST(request: NextRequest) {
         });
 
         console.log('Password reset email sent to:', email);
-      } catch (emailError) {
-        console.error('Failed to send email:', emailError);
-        // Don't fail the request if email fails - the token is still created
+        } catch (emailError) {
+          console.error('Failed to send email:', emailError);
+          // Don't fail the request if email fails - the token is still created
+        }
       }
     } else {
       // Development mode - log the reset URL
