@@ -79,5 +79,7 @@ model Application {
   @@index([dateApplied])
   @@index([company])
   @@index([foundOn])
+  @@index([userId, dateApplied(sort: Desc)])  // Composite index for common query pattern
+  @@index([userId, status])                    // Composite index for filtering by user and status
   @@map("applications")
 }

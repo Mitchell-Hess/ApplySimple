@@ -14,8 +14,34 @@ export async function GET(request: NextRequest) {
     }
 
     const searchParams = request.nextUrl.searchParams;
-    const limit = searchParams.get('limit');
-    const offset = searchParams.get('offset');
+    const limitParam = searchParams.get('limit');
+    const offsetParam = searchParams.get('offset');
+
+    // Validate and sanitize pagination parameters
+    let limit: number | undefined;
+    let offset: number | undefined;
+
+    if (limitParam) {
+      const parsedLimit = parseInt(limitParam, 10);
+      if (isNaN(parsedLimit) || parsedLimit < 1 || parsedLimit > 1000) {
+        return NextResponse.json(
+          { error: 'Invalid limit parameter. Must be between 1 and 1000.' },
+          { status: 400 }
+        );
+      }
+      limit = parsedLimit;
+    }
+
+    if (offsetParam) {
+      const parsedOffset = parseInt(offsetParam, 10);
+      if (isNaN(parsedOffset) || parsedOffset < 0) {
+        return NextResponse.json(
+          { error: 'Invalid offset parameter. Must be a non-negative number.' },
+          { status: 400 }
+        );
+      }
+      offset = parsedOffset;
+    }
 
     // Fetch applications from database, filtered by user and ordered by most recent first
     const applications = await prisma.application.findMany({
@@ -23,8 +49,8 @@ export async function GET(request: NextRequest) {
         userId: session.user.id,
       },
       orderBy: { dateApplied: 'desc' },
-      take: limit ? parseInt(limit) : undefined,
-      skip: offset ? parseInt(offset) : undefined,
+      take: limit,
+      skip: offset,
     });
 
     return NextResponse.json(applications);
@@ -49,19 +75,69 @@ export async function POST(request: NextRequest) {
 
     const body = await request.json();
 
+    // Validate required fields
+    if (!body.company || typeof body.company !== 'string' || !body.company.trim()) {
+      return NextResponse.json(
+        { error: 'Company name is required' },
+        { status: 400 }
+      );
+    }
+
+    if (!body.jobTitle || typeof body.jobTitle !== 'string' || !body.jobTitle.trim()) {
+      return NextResponse.json(
+        { error: 'Job title is required' },
+        { status: 400 }
+      );
+    }
+
+    if (!body.dateApplied) {
+      return NextResponse.json(
+        { error: 'Date applied is required' },
+        { status: 400 }
+      );
+    }
+
+    // Validate date format
+    const dateApplied = new Date(body.dateApplied);
+    if (isNaN(dateApplied.getTime())) {
+      return NextResponse.json(
+        { error: 'Invalid date format for dateApplied' },
+        { status: 400 }
+      );
+    }
+
+    // Validate optional date if provided
+    let dateOfOutcome: Date | null = null;
+    if (body.dateOfOutcome) {
+      dateOfOutcome = new Date(body.dateOfOutcome);
+      if (isNaN(dateOfOutcome.getTime())) {
+        return NextResponse.json(
+          { error: 'Invalid date format for dateOfOutcome' },
+          { status: 400 }
+        );
+      }
+    }
+
+    if (!body.foundOn || typeof body.foundOn !== 'string') {
+      return NextResponse.json(
+        { error: 'Application source (foundOn) is required' },
+        { status: 400 }
+      );
+    }
+
     // Normalize data before saving
     const normalizedData = {
       userId: session.user.id,
       company: normalizeCompany(body.company),
-      jobTitle: body.jobTitle?.trim(),
+      jobTitle: body.jobTitle.trim(),
       salary: body.salary?.trim(),
       jobType: normalizeJobType(body.jobType),
       jobUrl: body.jobUrl?.trim(),
-      dateApplied: new Date(body.dateApplied),
+      dateApplied,
       foundOn: normalizeSource(body.foundOn),
       coverLetterUsed: body.coverLetterUsed || false,
       numberOfRounds: body.numberOfRounds,
-      dateOfOutcome: body.dateOfOutcome ? new Date(body.dateOfOutcome) : null,
+      dateOfOutcome,
       notes: body.notes?.trim(),
       status: normalizeStatus(body.status),
     };
