@@ -3,6 +3,27 @@ import { prisma } from '@/lib/prisma';
 import { randomBytes } from 'crypto';
 import { Resend } from 'resend';
 
+// Simple in-memory rate limiting (consider Redis for production multi-instance deployments)
+const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
+
+function checkRateLimit(email: string): boolean {
+  const now = Date.now();
+  const limit = rateLimitMap.get(email);
+
+  if (!limit || now > limit.resetTime) {
+    // Allow request and set new limit (max 3 requests per 15 minutes)
+    rateLimitMap.set(email, { count: 1, resetTime: now + 15 * 60 * 1000 });
+    return true;
+  }
+
+  if (limit.count >= 3) {
+    return false; // Rate limit exceeded
+  }
+
+  limit.count++;
+  return true;
+}
+
 export async function POST(request: NextRequest) {
   try {
     const { email } = await request.json();
@@ -11,6 +32,23 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { error: 'Email is required' },
         { status: 400 }
+      );
+    }
+
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return NextResponse.json(
+        { error: 'Invalid email format' },
+        { status: 400 }
+      );
+    }
+
+    // Rate limiting check
+    if (!checkRateLimit(email.toLowerCase())) {
+      return NextResponse.json(
+        { error: 'Too many password reset requests. Please try again in 15 minutes.' },
+        { status: 429 }
       );
     }
 

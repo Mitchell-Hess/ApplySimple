@@ -46,8 +46,16 @@ function ResetPasswordForm() {
       return;
     }
 
-    if (password.length < 6) {
-      setError('Password must be at least 6 characters long');
+    if (password.length < 8) {
+      setError('Password must be at least 8 characters long');
+      return;
+    }
+
+    const hasNumber = /\d/.test(password);
+    const hasLetter = /[a-zA-Z]/.test(password);
+
+    if (!hasNumber || !hasLetter) {
+      setError('Password must contain at least one letter and one number');
       return;
     }
 
@@ -118,10 +126,10 @@ function ResetPasswordForm() {
                     required
                     placeholder="••••••••"
                     style={inputStyle}
-                    minLength={6}
+                    minLength={8}
                   />
                   <Text fontSize="xs" color={colorMode === 'light' ? 'gray.500' : 'gray.400'} mt={1}>
-                    Must be at least 6 characters
+                    Must be at least 8 characters with one letter and one number
                   </Text>
                 </Box>
 
@@ -136,7 +144,7 @@ function ResetPasswordForm() {
                     required
                     placeholder="••••••••"
                     style={inputStyle}
-                    minLength={6}
+                    minLength={8}
                   />
                 </Box>
 
