@@ -242,7 +242,16 @@ export default function Home() {
 
   // Generate ML predictions when applications are loaded
   useEffect(() => {
-    if (applications && applications.length > 0 && predictions.size === 0 && !loadingRef.current) {
+    // Clear predictions if there are no applications
+    if (!applications || applications.length === 0) {
+      if (predictions.size > 0) {
+        setPredictions(new Map());
+      }
+      return;
+    }
+
+    // Generate predictions for applications
+    if (predictions.size === 0 && !loadingRef.current) {
       loadingRef.current = true;
       generatePredictions(applications)
         .then((newPredictions) => {

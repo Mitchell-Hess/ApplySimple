@@ -18,6 +18,23 @@ const COLORS = {
   Withdrawn: '#6b7280',  // gray-500 - neutral gray
 };
 
+// Fallback colors for custom status values (like '0', '1', etc. from CSV import)
+const FALLBACK_COLORS = [
+  '#ec4899',  // pink-500
+  '#14b8a6',  // teal-500
+  '#f97316',  // orange-500
+  '#06b6d4',  // cyan-500
+  '#a855f7',  // purple-500
+  '#84cc16',  // lime-500
+  '#f43f5e',  // rose-500
+  '#0ea5e9',  // sky-500
+];
+
+// Get color for a status, with fallback for unknown statuses
+const getStatusColor = (statusName: string, index: number): string => {
+  return COLORS[statusName as keyof typeof COLORS] || FALLBACK_COLORS[index % FALLBACK_COLORS.length];
+};
+
 export function StatusChart({ applications }: StatusChartProps) {
   const { colorMode } = useColorMode();
 
@@ -53,30 +70,34 @@ export function StatusChart({ applications }: StatusChartProps) {
         borderColor={colorMode === 'light' ? 'gray.300' : 'gray.600'}
       >
         <ResponsiveContainer width="100%" height={400}>
-          <PieChart margin={{ top: 15, right: 70, bottom: 15, left: 70 }}>
+          <PieChart margin={{ top: 20, right: 80, bottom: 20, left: 80 }}>
             <Pie
               data={data}
               cx="50%"
               cy="50%"
               labelLine={{
-                stroke: '#9ca3af',
+                stroke: colorMode === 'light' ? '#9ca3af' : '#6b7280',
                 strokeWidth: 1.5,
               }}
               label={(props: unknown) => {
                 const RADIAN = Math.PI / 180;
                 const { cx, cy, midAngle, outerRadius, name, percent, value } = props as { cx: number; cy: number; midAngle: number; outerRadius: number; name: string; percent: number; value: number };
-                const radius = outerRadius + 35;
+                const radius = outerRadius + 40;
                 const x = cx + radius * Math.cos(-midAngle * RADIAN);
                 const y = cy + radius * Math.sin(-midAngle * RADIAN);
+
+                // Determine text anchor based on position
+                const isRightSide = x > cx;
+                const textAnchor = isRightSide ? 'start' : 'end';
 
                 return (
                   <g>
                     <text
                       x={x}
-                      y={y - 10}
+                      y={y - 8}
                       fill={colorMode === 'light' ? '#1f2937' : '#f3f4f6'}
-                      textAnchor={x > cx ? 'start' : 'end'}
-                      dominantBaseline="central"
+                      textAnchor={textAnchor}
+                      dominantBaseline="middle"
                       fontWeight="800"
                       fontSize="15"
                       style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}
@@ -87,8 +108,8 @@ export function StatusChart({ applications }: StatusChartProps) {
                       x={x}
                       y={y + 10}
                       fill={colorMode === 'light' ? '#6b7280' : '#d1d5db'}
-                      textAnchor={x > cx ? 'start' : 'end'}
-                      dominantBaseline="central"
+                      textAnchor={textAnchor}
+                      dominantBaseline="middle"
                       fontWeight="600"
                       fontSize="13"
                       style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}
@@ -109,7 +130,7 @@ export function StatusChart({ applications }: StatusChartProps) {
               {data.map((entry, index) => (
                 <Cell
                   key={`cell-${index}`}
-                  fill={COLORS[entry.name as keyof typeof COLORS]}
+                  fill={getStatusColor(entry.name, index)}
                 />
               ))}
             </Pie>
@@ -132,8 +153,9 @@ export function StatusChart({ applications }: StatusChartProps) {
 
       {/* Legend with Stats */}
       <VStack align="stretch" gap={2}>
-        {data.map((item) => {
+        {data.map((item, index) => {
           const percentage = ((item.value / total) * 100).toFixed(1);
+          const statusColor = getStatusColor(item.name, index);
           return (
             <Box
               key={item.name}
@@ -144,7 +166,7 @@ export function StatusChart({ applications }: StatusChartProps) {
               borderColor={colorMode === 'light' ? 'gray.200' : 'gray.600'}
               shadow="sm"
               transition="all 0.2s"
-              _hover={{ shadow: 'md', borderColor: COLORS[item.name as keyof typeof COLORS] }}
+              _hover={{ shadow: 'md', borderColor: statusColor }}
             >
               <HStack justify="space-between">
                 <HStack gap={3}>
@@ -152,7 +174,7 @@ export function StatusChart({ applications }: StatusChartProps) {
                     w={4}
                     h={4}
                     borderRadius="md"
-                    bg={COLORS[item.name as keyof typeof COLORS]}
+                    bg={statusColor}
                   />
                   <Text fontWeight="semibold" color={colorMode === 'light' ? 'gray.900' : 'white'} fontSize={{ base: "sm", md: "md" }}>
                     {item.name}
