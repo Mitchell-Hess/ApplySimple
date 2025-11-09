@@ -14,9 +14,10 @@ export function middleware(request: NextRequest) {
   const isLoggedIn = !!sessionToken;
 
   const isAuthPage = pathname.startsWith('/auth');
+  const isPasswordResetPage = pathname === '/auth/reset-password' || pathname === '/auth/forgot-password';
 
-  // Redirect logged-in users away from auth pages
-  if (isAuthPage && isLoggedIn) {
+  // Redirect logged-in users away from auth pages (except password reset pages)
+  if (isAuthPage && isLoggedIn && !isPasswordResetPage) {
     return NextResponse.redirect(new URL('/', request.url));
   }
 

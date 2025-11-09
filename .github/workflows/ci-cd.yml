@@ -154,26 +154,27 @@ jobs:
           cache-to: type=gha,mode=max
 
   # Deploy to Production (only on main branch)
-  deploy:
-    name: Deploy to Production
-    runs-on: ubuntu-latest
-    needs: [frontend, ml-service, database, docker]
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+  # Note: Vercel auto-deploys via Git integration, so manual deployment step is not needed
+  # deploy:
+  #   name: Deploy to Production
+  #   runs-on: ubuntu-latest
+  #   needs: [frontend, ml-service, database, docker]
+  #   if: github.ref == 'refs/heads/main' && github.event_name == 'push'
 
-    steps:
-      - uses: actions/checkout@v4
+  #   steps:
+  #     - uses: actions/checkout@v4
 
-      - name: Deploy Frontend to Vercel
-        uses: amondnet/vercel-action@v25
-        with:
-          vercel-token: ${{ secrets.VERCEL_TOKEN }}
-          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
-          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
-          working-directory: ./frontend
-          vercel-args: '--prod'
+  #     - name: Deploy Frontend to Vercel
+  #       uses: amondnet/vercel-action@v25
+  #       with:
+  #         vercel-token: ${{ secrets.VERCEL_TOKEN }}
+  #         vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+  #         vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+  #         working-directory: ./frontend
+  #         vercel-args: '--prod'
 
-      # Add Railway deployment or your preferred platform
-      - name: Deploy ML Service
-        run: |
-          echo "Deploy ML service to Railway, Render, or your platform"
-          # Add your deployment commands here
+  #     # Add Railway deployment or your preferred platform
+  #     - name: Deploy ML Service
+  #       run: |
+  #         echo "Deploy ML service to Railway, Render, or your platform"
+  #         # Add your deployment commands here
